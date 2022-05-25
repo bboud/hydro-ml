@@ -1,74 +1,75 @@
-from keras.models import Sequential
-from keras.layers import Dense
+import tensorflow as tf
+from tensorflow import keras
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.layers import Activation, Dense
+from tensorflow.keras.optimizers import Adam
+from tensorflow.keras.metrics import binary_crossentropy
 import os
 import numpy as np
 import tensorflow as tf
 import matplotlib.pyplot as plt
 
-#Size defines how many events in the dataset we want to load.
+#%%%
+def Kernel(x, x0):
+    sigma = 0.8
+    protonFraction = 0.4
+    norm = protonFraction/(np.sqrt(2.*np.pi)*sigma)
+    return(norm*np.exp(-(x - x0)**2./(2.*sigma**2.)))
+
+def testDataGen():
+    A = 197
+    yBeam = 5.36
+    slope = 0.5
+    sigmaEtas = 0.2
+    
+    # generate input data
+    nBaryons = np.random.randint(0, 2*A)
+    randX = np.random.uniform(0, 1, size=nBaryons)
+    etasBaryon = 1./slope*np.arcsinh((2.*randX - 1)*np.sinh(slope*yBeam))
+    etasArr = np.linspace(-7, 7, 141)
+    dNBdetas = np.zeros(len(etasArr))
+    norm = 1./(np.sqrt(2.*np.pi)*sigmaEtas)
+    for iB in etasBaryon:
+        dNBdetas += norm*np.exp(-(etasArr - iB)**2./(2.*sigmaEtas**2.))
+    
+    # generate test data with convolution with a kernel
+    dNpdy = np.zeros(len(etasArr))
+    detas = etasArr[1] - etasArr[0]
+    for i in range(len(etasArr)):
+        dNpdy[i] = sum(Kernel(etasArr, etasArr[i])*dNBdetas)*detas
+        
+    # generate fake data with random noise
+    dNBdetasFake = np.random.uniform(0.0, dNBdetas.max(), size=len(etasArr))
+    dNpdyFake = np.random.uniform(0.0, dNpdy.max(), size=len(etasArr))
+    return(etasArr, dNBdetas, dNpdy, dNBdetasFake, dNpdyFake)
+#%%%
+
 def generateData(size=500):
     print('Generating Data...')
-    
-    path = './3DAuAu200_minimumbias_BG16_tune17'
-    
-    #Cannot enumerate within the for loop becasue it will count all files found and not the number of files we are importing.
-    i = 0
-    
-    data = []
-    data_y = []
-    
-    etas = []
-    
-    for file in os.listdir(path):
-        #We want to break this loop when we hit the size we want.
-        if i >= size:
-            break
+    dataArr = []
+    labelArr = []  
+    for iev in range(size):
+        x, y1, y2, y3, y4 = testDataGen()
         
-        #Only register events with baryon_etas
-        if file.find('baryon_etas') == -1:
-            continue
+        dim = len(x)
         
-        #This split will get the eventID specifically from the file string.
-        eventID = file.split('_')[1]
+        # real data
+        x = np.hstack((y1.reshape(dim, 1), y2.reshape(dim, 1)))
+        dataArr.append(x)
+        labelArr.append(np.ones((dim, 2)))
         
-        #Baryons
-        etas, X1 = np.loadtxt(path+'/event_' + eventID + '_net_baryon_etas.txt', unpack=True)
-        
-        #Protons
-        _, X2, _ = np.loadtxt(path+'/event_' + eventID + '_net_proton_eta.txt', unpack=True)
-    
-        #Stack neatly
-        #The ones and zeros arrays need to be the same shape as the input. We pair them here
-        #so that the training data can be shuffled.
-        x = np.hstack( ( X1.reshape(141,1), X2.reshape(141,1)))
-    
-        data.append(x)
-        data_y.append(np.ones((141,2)))
-        
-        #Generate Fake Data
-        
-        #Baryons
-        X1 = np.random.uniform(0.0, 100.0, size=141)
-        #Protons
-        X2 = np.random.uniform(0.0, 20, size=141)
-        # stack arrays
-        x = np.hstack((X1.reshape(141, 1), X2.reshape(141,1)))
-            
-        data.append(x)
-        data_y.append(np.zeros((141,2)))
-        
-        i+=1
-        
-    print('Done!')
-    return etas, data, data_y
-    
-#generateData(size=5)
+        # fake data
+        x = np.hstack((y3.reshape(dim, 1), y4.reshape(dim, 1)))
+        dataArr.append(x)
+        labelArr.append(np.zeros((dim, 2)))
+    print("done")
+    return(np.array(dataArr), np.array(labelArr))
 
-def defineModel():
+def defineModel(shape):
     #Sequential model
     model = Sequential()
     
-    shape = (141,2)
+    print(shape)
     
     # #Input layer
     model.add(Dense(25, activation='relu', input_shape=shape))
@@ -88,27 +89,33 @@ def defineModel():
 
 def train(epochs=5):
     #Generate the shuffled data
-    _, data, data_y = generateData(size=2048)
+    data, labels = generateData(size=5000)
     
-    model = defineModel()
+    shape = data[0].shape
     
-    # print(np.shape(data))
-    # print(np.shape(data_y))
+    model = Sequential([
+        Dense(units=32, activation='relu', input_shape=shape),
+        Dense(units=16, activation='relu'),
+        Dense(units=4, activation='relu'),
+        Dense(units=1, activation='sigmoid')
+    ])
+    model.summary()
     
-    #Fit will actually train the model.
-    # X: input of shape (2,141)
-    # Y: target catagorization, either 1 or 0. Shape (141,2) for consistancy with X
+    model.compile(loss='binary_crossentropy',
+                  optimizer=Adam(learning_rate=0.0001),
+                  metrics=['accuracy'])
+                  
     model.fit(
-        x=np.array(data),
-        y=np.array(data_y),
-        epochs=epochs,
-        use_multiprocessing=True,
-        workers=10
+      x=np.array(data),
+      y=np.array(labels),
+      epochs=epochs,
+      use_multiprocessing=True,
+      workers=10
     )
     
     model.save_weights('./weights', overwrite=True)
     
-#train(epochs=10)
+train(epochs=200)
 
 def graph(etas, data1, data2):
     fig, (ax0, ax1, ax2) = plt.subplots(nrows=3, ncols=1, figsize=(10,5))
@@ -141,10 +148,3 @@ def prediction():
     
     #Data coming out of this function is formatted for the input layer, we need to get it back into its import form.
     etas, data, _ = generateData(size=2)
-    
-
-    
-prediction()
-# prediction()
-# prediction()
-# prediction()
