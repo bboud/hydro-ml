@@ -217,16 +217,16 @@ def train(epochs):
 
 train_discriminator_only(epochs=1000)
 
-train(1000)
-
 total_gen_loss, total_disc_loss = train(1000)
 
 plt.plot(np.arange(0, len(total_gen_loss), 1, int ), total_gen_loss)
 plt.plot(np.arange(0, len(total_disc_loss), 1, int ), total_disc_loss)
 fig=plt.Figure()
+plt.show()
 
 noise = tf.random.normal([1, 100])
 generated_data = G(noise, training=False)
 generated_data = generated_data.numpy().flatten()
 plt.plot(np.arange(0, len(generated_data), 1, int ), generated_data)
 fig=plt.Figure()
+plt.show()
