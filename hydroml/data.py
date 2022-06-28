@@ -1,24 +1,23 @@
 import numpy as np
 from numba import jit
+from torch.utils.data import Dataset
 
 @jit
-def kernel(x, x0):
+def _kernel(x, x0):
     sigma = 0.8
     protonFraction = 0.4
     norm = protonFraction / (np.sqrt(2. * np.pi) * sigma)
     return norm * np.exp(-(x - x0) ** 2. / (2. * sigma ** 2.))
 
-
 @jit
-def fake_kernel(x, x0, s):
+def _fake_kernel(x, x0, s):
     sigma = s
     protonFraction = 0.4
     norm = protonFraction / (np.sqrt(2. * np.pi) * sigma)
     return norm * np.exp(-(x - x0) ** 2. / (2. * sigma ** 2.))
 
-
 @jit
-def test_data_gen(fakekernel=False, sigma=0.4):
+def _test_data_gen(fakekernel=False, sigma=0.4):
     A = 197
     yBeam = 5.36
     slope = 0.5
@@ -38,37 +37,30 @@ def test_data_gen(fakekernel=False, sigma=0.4):
     dNpdy = np.zeros(len(etasArr))
     detas = etasArr[1] - etasArr[0]
     for i in range(len(etasArr)):
-        dNpdy[i] = sum(kernel(etasArr, etasArr[i]) * dNBdetas) * detas
+        dNpdy[i] = sum(_kernel(etasArr, etasArr[i]) * dNBdetas) * detas
 
-    if fakekernel:
-        # dNBdetasFake = np.random.uniform(0.0, dNBdetas.max(), size=len(etasArr))
-        dNpdyFake = np.zeros(len(etasArr))
-        detas = etasArr[1] - etasArr[0]
-        for i in range(len(etasArr)):
-            dNpdyFake[i] = sum(fake_kernel(etasArr, etasArr[i], sigma) * dNBdetas) * detas
+    return etasArr, dNBdetas, dNpdy
 
-        return etasArr, dNBdetas, dNpdy, dNBdetas, dNpdyFake
-    else:
-        # generate fake data with random noise
-        dNBdetasFake = np.random.uniform(0.0, dNBdetas.max(), size=len(etasArr))
-        dNpdyFake = np.random.uniform(0.0, dNpdy.max(), size=len(etasArr))
-
-        return etasArr, dNBdetas, dNpdy, dNBdetasFake, dNpdyFake
-
-
-def generate_data(size=128):
+def generate_data(size):
     real_data = []
-    fake_data = []
 
     for iev in range(size):
-        x, y1, y2, y3, y4 = test_data_gen()
+        x, y1, y2 = _test_data_gen()
 
         # real data - Block
         x = y2
         real_data.append(x)
 
-        # fake data: random - Block
-        x = y4
-        fake_data.append(x)
+    return np.array(real_data, dtype=np.float32)
 
-    return np.array(real_data, dtype=np.float32), np.array(fake_data, dtype=np.float32)
+class Data(Dataset):
+    def __init__(self, size=1):
+        assert(size >= 1)
+        self.size = size
+        self.data = generate_data(self.size)
+
+    def __len__(self):
+        return self.size
+
+    def __getitem__(self, item):
+        return self.data[item]
