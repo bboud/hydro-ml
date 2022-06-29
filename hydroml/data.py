@@ -10,13 +10,6 @@ def _kernel(x, x0):
     return norm * np.exp(-(x - x0) ** 2. / (2. * sigma ** 2.))
 
 @jit
-def _fake_kernel(x, x0, s):
-    sigma = s
-    protonFraction = 0.4
-    norm = protonFraction / (np.sqrt(2. * np.pi) * sigma)
-    return norm * np.exp(-(x - x0) ** 2. / (2. * sigma ** 2.))
-
-@jit
 def _test_data_gen(fakekernel=False, sigma=0.4):
     A = 197
     yBeam = 5.36
@@ -49,7 +42,7 @@ def generate_data(size):
 
         # real data - Block
         x = y2
-        real_data.append(x)
+        real_data.append(np.array(x).reshape(1,128))
 
     return np.array(real_data, dtype=np.float32)
 
