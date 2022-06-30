@@ -10,6 +10,7 @@ class Discriminator(nn.Module):
 
         self.input_layer = self._input_block()
 
+        # Input Size
         self.layer1 = self._block((ndf // 16), (ndf // 8), 4, 2, 2, 1)
 
         self.layer2 = self._block((ndf // 8), (ndf // 4), 4, 2, 2, 1)
@@ -33,7 +34,7 @@ class Discriminator(nn.Module):
 
         return nn.Sequential(
             # Shape: 1 x 128; One channel by 128 elements
-            self._block(1, (self.ndf // 16), 4, 2, 2, 1),
+            self._block(1, (self.ndf // 16), 11, 2, 2, 1),
         )
 
     def _output_block(self):

@@ -31,12 +31,24 @@ def layer_hook():
     def hook(module, input, output):
         output_array = output.detach().numpy()
 
-        # There are a large number of these, but we will only sample 4.
-        fig = plt.figure(figsize=(20,5))
-        ax = fig.subplots( 4, 4 )
-        for i in range(4):
-            for j in range(4):
-                ax[i][j].plot( np.arange( len(output_array[i][j]) ), output_array[i][j])
+        total = []
+
+        for i in range(output_array.shape[0]):
+            total.append(output_array[i].flatten())
+
+        total = np.array(total)
+
+        assert(total.shape[1] % 2 == 0)
+
+        x_shape = total.shape[0]*2
+        y_shape = total.shape[1]//2
+
+        half_shape = (total.shape[0]*total.shape[1]) // 2
+
+        fig, ax = plt.subplots(1,1, figsize=(10,10))
+        ax.imshow(total.reshape(x_shape, y_shape), cmap='tab20b', interpolation='bicubic')
+        ax.set_title('Learned Feature for Selected Layer')
+        ax.axis('off')
         plt.show()
 
         return output
