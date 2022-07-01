@@ -5,20 +5,20 @@ import torch
 from IPython import display
 import numpy as np
 
-def plot_telemetry(loss_total, real_total, fake_total):
+def plot_telemetry(disc_loss_total, gen_loss_total, real_total, fake_total):
     display.clear_output(wait=True)
     fig = plt.figure(figsize=(15,10))
     ax = fig.subplots(2,1)
 
-    ax[0].plot(loss_total, '-o')
-    ax[0].set_title("Discriminator Loss")
+    ax[0].plot(disc_loss_total, '-o', label = 'Discriminator Loss', color='red')
+    ax[0].plot(gen_loss_total, '-o', label='Generator Loss', color='blue')
+    ax[0].set_title("Model Loss")
     ax[0].set_ylabel("Binary Cross Entropy Loss")
     ax[0].set_xlabel("Iterations")
+    ax[0].legend()
 
-    ax[1].plot(real_total, '-o', label="Mean Real Output")
-
-    ax[1].plot(fake_total, '-o', label="Mean Fake Output")
-
+    ax[1].plot(real_total, '-o', label="Mean Real Output", color='blue')
+    ax[1].plot(fake_total, '-o', label="Mean Fake Output", color='red')
     ax[1].set_title("Mean Output")
     ax[1].set_ylabel("Mean")
     ax[1].set_xlabel("Iterations")
@@ -42,8 +42,6 @@ def layer_hook():
 
         x_shape = total.shape[0]*2
         y_shape = total.shape[1]//2
-
-        half_shape = (total.shape[0]*total.shape[1]) // 2
 
         fig, ax = plt.subplots(1,1, figsize=(10,10))
         ax.imshow(total.reshape(x_shape, y_shape), cmap='tab20b', interpolation='bicubic')
