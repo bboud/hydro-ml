@@ -16,7 +16,7 @@ class Discriminator(nn.Module):
 
         self.layer3 = self._block((ndf // 4), (ndf // 2), 4, 2, 2, 1)
 
-        self.layer4 = self._block((ndf // 2), (ndf), 4, 2, 2, 1)
+        self.layer4 = self._block((ndf // 2), ndf, 4, 2, 2, 1)
 
         self.output_layer = self._output_block()
 
@@ -42,7 +42,8 @@ class Discriminator(nn.Module):
         t = self.layer2(t)
         t = self.layer3(t)
         t = self.layer4(t)
-        return self.output_layer(t)
+        t = self.output_layer(t)
+        return t
 
 class Generator(nn.Module):
     def __init__(self, ngf, nz):
@@ -53,24 +54,20 @@ class Generator(nn.Module):
         self.ngf = ngf
         self.nz = nz
 
-        # Input is 512 channels and we ConvTranspose down to 1 output channel with 128 elements.
-        # Input block is stride 1
-        self.input_layer = self._block(nz, ngf, 4, 1)
+        self.input_layer = self._block(nz, ngf, 5, 1)
 
-        self.layer1 = self._block(ngf, (ngf // 2), 4, 2,)
+        self.layer1 = self._block(ngf, (ngf // 2), 5, 2,)
 
-        self.layer2 = self._block((ngf // 2), (ngf // 4), 4, 2,)
+        self.layer2 = self._block((ngf // 2), (ngf // 4), 5, 2,)
 
-        self.layer3 = self._block((ngf // 4), (ngf // 8), 4, 2)
-
-        self.layer4 = self._block((ngf // 8), (ngf // 16), 4, 2)
+        self.layer3 = self._block((ngf // 4), (ngf // 8), 5, 2)
 
         self.output_layer = self._output_block()
 
     # Repeatable Layer Block
     def _block(self, channels_in, channels_out, kernel_size, stride):
         return nn.Sequential(
-            nn.ConvTranspose1d(channels_in, channels_out, kernel_size, stride, padding=0, dilation=1, bias=False),
+            nn.ConvTranspose1d(channels_in, channels_out, kernel_size, stride, dilation=1, bias=False),
             nn.BatchNorm1d(channels_out),
             nn.LeakyReLU(0.2, inplace=True),
             nn.Dropout(p=0.2),
@@ -78,10 +75,8 @@ class Generator(nn.Module):
 
     def _output_block(self):
         return nn.Sequential(
-            # ConvTranspose up to 128 elements.
-            # Output block is stride 2
-            nn.ConvTranspose1d( (self.ngf // 8), 1, 38, 2, dilation=1, bias=False),
-            nn.Tanh(),
+            nn.ConvTranspose1d( (self.ngf // 8), 1, 8, 2, dilation=1, bias=False),
+            nn.Sigmoid(),
         )
 
     def forward(self, t):
@@ -93,8 +88,6 @@ class Generator(nn.Module):
         t = self.layer2(t)
         #print(t.size())
         t = self.layer3(t)
-        #print(t.size())
-        #t = self.layer4(t)
         #print(t.size())
         t = self.output_layer(t)
         #print(t.size())
