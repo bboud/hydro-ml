@@ -35,25 +35,25 @@ def _test_data_gen(fakekernel=False, sigma=0.4):
     return etasArr, dNBdetas, dNpdy
 
 def generate_data(size):
-    real_data = []
+    baryons = []
+    protons = []
 
     for iev in range(size):
         x, y1, y2 = _test_data_gen()
 
-        # real data - Block
-        x = y2
-        real_data.append(np.array(x).reshape(1,128))
+        baryons.append(np.array(y1).reshape(1,128))
+        protons.append(np.array(y2).reshape(1,128))
 
-    return np.array(real_data, dtype=np.float32)
+    return np.array(baryons, dtype=np.float32), np.array(protons, dtype=np.float32)
 
 class Data(Dataset):
     def __init__(self, size=1):
         assert(size >= 1)
         self.size = size
-        self.data = generate_data(self.size)
+        self.data, self.labels = generate_data(self.size)
 
     def __len__(self):
         return self.size
 
     def __getitem__(self, item):
-        return self.data[item]
+        return self.data[item], self.labels[item]

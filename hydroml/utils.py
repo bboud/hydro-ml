@@ -7,16 +7,9 @@ class Mode(enum.Enum):
 
     NONE = -1
 
-class ModelType(enum.Enum):
-    GENERATOR = 0
-    DISCRIMINATOR = 1
-
-    NONE = -1
-
 class ImageChannel():
     def __init__(self):
         self.mode = Mode.NONE
-        self.type = ModelType.NONE
         self.batch_images = []
 
     def __len__(self):
