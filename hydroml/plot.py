@@ -13,7 +13,7 @@ def plot_telemetry(d_image_channel, disc_loss_total, outputs, labels):
     ax0 = fig.add_subplot(gs[0, 0])
     ax0.plot(disc_loss_total, color='red')
     ax0.set_title("Model Loss")
-    ax0.set_ylabel("Mean Squared Loss")
+    ax0.set_ylabel("Mean Squared Error Loss")
     ax0.set_xlabel("Batches")
 
     ax1 = fig.add_subplot(gs[1,0])
