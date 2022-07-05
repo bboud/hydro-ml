@@ -22,7 +22,7 @@ def plot_telemetry(d_image_channel, disc_loss_total, outputs, labels):
     ax1.set_title("Model Output")
     ax1.set_ylabel("$dN^{ch}/d\eta$")
     ax1.set_xlabel("$\eta$")
-    ax1.set_ylim([-0.05, 30.05])
+    ax1.set_ylim([-0.05, 20.05])
     ax1.legend()
 
     for i in range(len(d_image_channel)):
@@ -33,6 +33,25 @@ def plot_telemetry(d_image_channel, disc_loss_total, outputs, labels):
         axi.axis('off')
 
     plt.show()
+
+def plot_output(outputs, labels):
+    fig = plt.figure(figsize=(10,35))
+
+    gs = gridspec.GridSpec(len(outputs), 1, hspace=len(outputs)*0.1)
+
+    print(outputs.shape)
+
+    for i in range(len(outputs)):
+        ax = fig.add_subplot(gs[i, 0])
+        ax.plot(outputs[i].flatten(), label="Generated Output", color='red')
+        ax.plot(labels[i].flatten(), '-.', label="Actual Output", color='blue')
+        ax.set_title("Model Output")
+        ax.set_ylabel("$dN^{ch}/d\eta$")
+        ax.set_xlabel("$\eta$")
+        ax.legend()
+
+    plt.show()
+
 
 def simple_layer_hook(layer_name, image_channel):
     def hook(module, input, output):
@@ -48,12 +67,10 @@ def simple_layer_hook(layer_name, image_channel):
 
         total = np.array(total)
 
-        print(total.shape[1])
+        assert(total.shape[1] % 3 == 0)
 
-        assert(total.shape[1] % 2 == 0)
-
-        x_shape = total.shape[0]*2
-        y_shape = total.shape[1]//2
+        x_shape = total.shape[0]*3
+        y_shape = total.shape[1]//3
 
         image_channel.push( total.reshape(x_shape, y_shape), layer_name)
 
