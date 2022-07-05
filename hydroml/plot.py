@@ -1,6 +1,6 @@
 import matplotlib.pyplot as plt
 import matplotlib.gridspec as gridspec
-from hydroml.utils import Mode
+from utils import Mode
 from IPython import display
 import numpy as np
 
