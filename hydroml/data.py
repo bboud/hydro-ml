@@ -5,7 +5,10 @@ from torch.utils.data import Dataset
 
 @jit
 def _kernel(x, x0):
-    sigma = 0.8
+    if x0 >= 0:
+        sigma = 0.9
+    if x0 < 0:
+        sigma = 0.1
     protonFraction = 0.4
     norm = protonFraction / (np.sqrt(2. * np.pi) * sigma)
     return norm * np.exp(-(x - x0) ** 2. / (2. * sigma ** 2.))
