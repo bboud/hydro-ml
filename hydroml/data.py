@@ -14,7 +14,7 @@ def _kernel(x, x0):
     return norm * np.exp(-(x - x0) ** 2. / (2. * sigma ** 2.))
 
 @jit
-def _test_data_gen(fakekernel=False, sigma=0.4):
+def _test_data_gen():
     A = 197
     yBeam = 5.36
     slope = 0.5
@@ -83,11 +83,20 @@ def get_real_data(size):
             './3DAuAu200_minimumbias_BG16_tune17/event_' + event + '_net_baryon_etas.txt', unpack=True)
         eta_proton, proton, error = np.loadtxt(
             './3DAuAu200_minimumbias_BG16_tune17/event_' + event + '_net_proton_eta.txt', unpack=True)
+        baryon = data_smoothing(baryon)
+        proton = data_smoothing(proton)
 
         baryons.append(baryon.reshape(1, 141))
         protons.append(proton.reshape(1, 141))
 
     return np.array(baryons, dtype=np.float32), np.array(protons, dtype=np.float32)
+
+def data_smoothing(data):
+    # Calculate the moving average
+    for i in range( 2, len(data) - 2 ):
+        average = np.float32( (data[i-2]  + data[i-1] + data[i] + data[i+1] + data[i+2]) / 5 )
+        data[i] = average
+    return data
 
 class RealData(Dataset):
     def __init__(self, size=1):
