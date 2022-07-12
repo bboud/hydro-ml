@@ -101,7 +101,37 @@ def data_smoothing(data):
 class RealData(Dataset):
     def __init__(self, size=1):
         assert(size >= 1)
-        self.data, self.labels = get_real_data(size)
+        self.data, self.labels = get_real_data()
+
+    def __len__(self):
+        return len(self.data)
+
+    def __getitem__(self, item):
+        return self.data[item], self.labels[item]
+
+def get_dE_detas_data():
+    dE_deta_initial = np.loadtxt('./dE_data/dE_detas_initial.txt')
+    dNch_deta_final = np.loadtxt('./dE_data/dNch_deta_final.txt')
+
+    initial_eta = dE_deta_initial[0:1].flatten()
+    final_eta = dNch_deta_final[0:1].flatten()
+
+    interpolated_dE_deta = []
+
+    for i in range(1, len(dE_deta_initial[1:])):
+
+        dE_deta_spline = dE_deta_initial[i:i+1].flatten()
+
+        interpolation = np.interp( final_eta, initial_eta, dE_deta_spline)
+
+        interpolated_dE_deta.append(interpolation)
+
+    return final_eta, interpolated_dE_deta, dNch_deta_final[1:]
+
+
+class DEData(Dataset):
+    def __init__(self):
+        self.data_axis, self.data, self.labels = get_dE_detas_data()
 
     def __len__(self):
         return len(self.data)

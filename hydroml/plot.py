@@ -4,7 +4,7 @@ from utils import Mode
 from IPython import display
 import numpy as np
 
-def plot_telemetry(d_image_channel, disc_loss_total, outputs, labels):
+def plot_telemetry(d_image_channel, disc_loss_total, outputs, labels, etas=None):
     display.clear_output(wait=True)
     fig = plt.figure(figsize=(20,15))
 
@@ -17,8 +17,10 @@ def plot_telemetry(d_image_channel, disc_loss_total, outputs, labels):
     ax0.set_xlabel("Batches")
     ax0.set_ylim([-0.05, 5.05])
 
-
-    x = np.linspace(-6.4, 6.4, 141)
+    if etas is not None:
+        x = etas
+    else:
+        x = np.linspace(-6.4, 6.4, 141)
     ax1 = fig.add_subplot(gs[1, : ])
     ax1.plot(x, outputs[0].flatten(), label="Generated Output", color='red')
     ax1.plot(x, labels[0].flatten(), '-.', label="Actual Output", color='blue')
