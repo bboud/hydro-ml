@@ -15,7 +15,7 @@ def plot_telemetry(d_image_channel, disc_loss_total, outputs, labels, etas=None)
     ax0.set_title("Model Loss")
     ax0.set_ylabel("Mean Squared Error Loss")
     ax0.set_xlabel("Batches")
-    ax0.set_ylim([-0.05, 5.05])
+    #ax0.set_ylim([-0.05, 5.05])
 
     if etas is not None:
         x = etas
@@ -40,11 +40,9 @@ def plot_telemetry(d_image_channel, disc_loss_total, outputs, labels, etas=None)
     plt.show()
 
 def plot_output(outputs, labels):
-    fig = plt.figure(figsize=(10,35))
+    fig = plt.figure(figsize=(15,40))
 
     gs = gridspec.GridSpec(len(outputs), 1, hspace=len(outputs)*0.1)
-
-    print(outputs.shape)
 
     x = np.linspace(-6.4, 6.4, 141)
 

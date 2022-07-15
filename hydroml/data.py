@@ -3,6 +3,8 @@ import os
 from numba import jit
 from torch.utils.data import Dataset
 
+######################################## TEST DATA GENERATION ########################################
+
 @jit
 def _kernel(x, x0):
     if x0 >= 0:
@@ -62,6 +64,8 @@ class Data(Dataset):
     def __getitem__(self, item):
         return self.data[item], self.labels[item]
 
+######################################## REAL DATA IMPORT ########################################
+
 def get_real_data(size):
     events = []
     i = 0
@@ -94,14 +98,14 @@ def get_real_data(size):
 def data_smoothing(data):
     # Calculate the moving average
     for i in range( 2, len(data) - 2 ):
-        average = np.float32( (data[i-2]  + data[i-1] + data[i] + data[i+1] + data[i+2]) / 5 )
+        average = np.float64( (data[i-2]  + data[i-1] + data[i] + data[i+1] + data[i+2]) / 5 )
         data[i] = average
     return data
 
 class RealData(Dataset):
     def __init__(self, size=1):
         assert(size >= 1)
-        self.data, self.labels = get_real_data()
+        self.data, self.labels = get_real_data(size)
 
     def __len__(self):
         return len(self.data)
@@ -109,25 +113,15 @@ class RealData(Dataset):
     def __getitem__(self, item):
         return self.data[item], self.labels[item]
 
+######################################## dE_detas DATA IMPORT ########################################
+
 def get_dE_detas_data():
     dE_deta_initial = np.loadtxt('./dE_data/dE_detas_initial.txt')
     dNch_deta_final = np.loadtxt('./dE_data/dNch_deta_final.txt')
 
-    initial_eta = dE_deta_initial[0:1].flatten()
     final_eta = dNch_deta_final[0:1].flatten()
 
-    interpolated_dE_deta = []
-
-    for i in range(1, len(dE_deta_initial[1:])):
-
-        dE_deta_spline = dE_deta_initial[i:i+1].flatten()
-
-        interpolation = np.interp( final_eta, initial_eta, dE_deta_spline)
-
-        interpolated_dE_deta.append(interpolation)
-
-    return final_eta, interpolated_dE_deta, dNch_deta_final[1:]
-
+    return final_eta, dE_deta_initial[1:], dNch_deta_final[1:]
 
 class DEData(Dataset):
     def __init__(self):
