@@ -28,14 +28,6 @@ class DEModel(nn.Module):
         super(DEModel, self).__init__()
         self.linear = nn.Linear(64, 141)
 
-
-    def _block(self, channels_in, channels_out, kernel_size, stride, padding, dilation):
-        if padding == "same":
-            padding = (kernel_size-1)//2
-        return nn.Sequential(
-            nn.Conv1d(channels_in, channels_out, kernel_size, stride, padding, dilation, bias=False),
-        )
-
     def forward(self, t):
         t = self.linear(t)
         return t
