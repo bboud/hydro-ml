@@ -40,7 +40,7 @@ def plot_telemetry(d_image_channel, disc_loss_total, outputs, labels, etas=None)
     plt.show()
 
 def plot_output(outputs, labels):
-    fig = plt.figure(figsize=(15,40))
+    fig = plt.figure(figsize=(10,50))
 
     gs = gridspec.GridSpec(len(outputs), 1, hspace=len(outputs)*0.1)
 

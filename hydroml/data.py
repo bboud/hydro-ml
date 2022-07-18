@@ -66,10 +66,14 @@ class Data(Dataset):
 
 ######################################## REAL DATA IMPORT ########################################
 
+#dataset_dir = '3DAuAu200_minimumbias_BG16_tune17'
+#dataset_dir = 'NetbaryonDis_OSG3DAuAu19.6_tune18.3_wBulk_22momdeltaf'
+dataset_dir = 'NetbaryonDis_OSG3DAuAu200_tune18.6_wBulk_22momdeltaf_wHBT'
+
 def get_real_data(size):
     events = []
     i = 0
-    for file in os.listdir('./3DAuAu200_minimumbias_BG16_tune17/'):
+    for file in os.listdir(f'./{dataset_dir}/'):
         if i >= size:
             break
         # Only register events with baryon_etas
@@ -81,19 +85,25 @@ def get_real_data(size):
 
     baryons = []
     protons = []
+
     for event in events:
         # Eta is the same for the datasets
         eta_baryon, baryon = np.loadtxt(
-            './3DAuAu200_minimumbias_BG16_tune17/event_' + event + '_net_baryon_etas.txt', unpack=True)
+            f'./{dataset_dir}/event_{event}_net_baryon_etas.txt', unpack=True)
         eta_proton, proton, error = np.loadtxt(
-            './3DAuAu200_minimumbias_BG16_tune17/event_' + event + '_net_proton_eta.txt', unpack=True)
+            f'./{dataset_dir}/event_{event}_net_proton_eta.txt', unpack=True)
+
+        # Limit the energy level
+        # if proton.max() < 5.0:
+        #     continue
+
         baryon = data_smoothing(baryon)
         proton = data_smoothing(proton)
 
         baryons.append(baryon.reshape(1, 141))
         protons.append(proton.reshape(1, 141))
 
-    return np.array(baryons, dtype=np.float32), np.array(protons, dtype=np.float32)
+    return np.array(baryons, dtype=np.float32), np.array(protons, dtype=np.float32), eta_proton
 
 def data_smoothing(data):
     # Calculate the moving average
@@ -105,7 +115,7 @@ def data_smoothing(data):
 class RealData(Dataset):
     def __init__(self, size=1):
         assert(size >= 1)
-        self.data, self.labels = get_real_data(size)
+        self.data, self.labels, self.data_axis = get_real_data(size)
 
     def __len__(self):
         return len(self.data)
