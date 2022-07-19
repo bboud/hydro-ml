@@ -13,3 +13,4 @@ Requirements for the software and other tools to build, test and push
 - [Pytorch](https://pytorch.org/)
 - [Matplotlib](https://matplotlib.org/)
 - [Numpy](https://numpy.org/)
+- (Optional) [Numba](https://numba.pydata.org/) - Responsible for JIT with generating test data. If you don't plan on generating test data, it's not needed!

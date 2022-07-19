@@ -1,17 +1,14 @@
 import matplotlib.pyplot as plt
 import matplotlib.gridspec as gridspec
-from utils import Mode
-from IPython import display
 import numpy as np
 
-def plot_telemetry(d_image_channel, disc_loss_total, outputs, labels, etas=None):
-    display.clear_output(wait=True)
+def plot_telemetry( loss_total, outputs, labels, etas=None):
     fig = plt.figure(figsize=(20,15))
 
-    gs = gridspec.GridSpec(3, len(d_image_channel))
+    gs = gridspec.GridSpec(2, 1)
 
     ax0 = fig.add_subplot(gs[0, : ])
-    ax0.plot(disc_loss_total, color='red')
+    ax0.plot(loss_total, color='red')
     ax0.set_title("Model Loss")
     ax0.set_ylabel("Mean Squared Error Loss")
     ax0.set_xlabel("Batches")
@@ -30,17 +27,10 @@ def plot_telemetry(d_image_channel, disc_loss_total, outputs, labels, etas=None)
     #ax1.set_ylim([-0.05, 30.05])
     ax1.legend()
 
-    for i in range(len(d_image_channel)):
-        image, name, mode = d_image_channel.pop()
-        axi = fig.add_subplot(gs[2, i])
-        axi.imshow(image, cmap='plasma', interpolation='bicubic')
-        axi.set_title(f'Mode[{mode.name}] - {name}')
-        axi.axis('off')
-
     plt.show()
 
 def plot_output(outputs, labels):
-    fig = plt.figure(figsize=(10,50))
+    fig = plt.figure(figsize=(20,10))
 
     gs = gridspec.GridSpec(len(outputs), 1, hspace=len(outputs)*0.1)
 
@@ -57,27 +47,27 @@ def plot_output(outputs, labels):
 
     plt.show()
 
-
-def simple_layer_hook(layer_name, image_channel):
-    def hook(module, input, output):
-        if image_channel.get_mode() == Mode.NOISE:
-            return
-
-        output_array = output.detach().numpy()
-
-        total = []
-
-        for i in range(output_array.shape[0]):
-            total.append(output_array[i].flatten())
-
-        total = np.array(total)
-
-        assert(total.shape[1] % 3 == 0)
-
-        x_shape = total.shape[0]*3
-        y_shape = total.shape[1]//3
-
-        image_channel.push( total.reshape(x_shape, y_shape), layer_name)
-
-        return output
-    return hook
+# Legacy
+# def simple_layer_hook(layer_name, image_channel):
+#     def hook(module, input, output):
+#         if image_channel.get_mode() == Mode.NOISE:
+#             return
+#
+#         output_array = output.detach().numpy()
+#
+#         total = []
+#
+#         for i in range(output_array.shape[0]):
+#             total.append(output_array[i].flatten())
+#
+#         total = np.array(total)
+#
+#         assert(total.shape[1] % 3 == 0)
+#
+#         x_shape = total.shape[0]*3
+#         y_shape = total.shape[1]//3
+#
+#         image_channel.push( total.reshape(x_shape, y_shape), layer_name)
+#
+#         return output
+#     return hook

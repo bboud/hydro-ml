@@ -52,7 +52,7 @@ def generate_data(size):
 
     return np.array(baryons, dtype=np.float32), np.array(protons, dtype=np.float32)
 
-class Data(Dataset):
+class GenData(Dataset):
     def __init__(self, size=1):
         assert(size >= 1)
         self.size = size
@@ -66,14 +66,10 @@ class Data(Dataset):
 
 ######################################## REAL DATA IMPORT ########################################
 
-#dataset_dir = '3DAuAu200_minimumbias_BG16_tune17'
-#dataset_dir = 'NetbaryonDis_OSG3DAuAu19.6_tune18.3_wBulk_22momdeltaf'
-dataset_dir = 'NetbaryonDis_OSG3DAuAu200_tune18.6_wBulk_22momdeltaf_wHBT'
-
-def get_real_data(size):
+def get_real_data(dataset, size):
     events = []
     i = 0
-    for file in os.listdir(f'./{dataset_dir}/'):
+    for file in os.listdir(f'./{dataset}/'):
         if i >= size:
             break
         # Only register events with baryon_etas
@@ -89,13 +85,9 @@ def get_real_data(size):
     for event in events:
         # Eta is the same for the datasets
         eta_baryon, baryon = np.loadtxt(
-            f'./{dataset_dir}/event_{event}_net_baryon_etas.txt', unpack=True)
+            f'./{dataset}/event_{event}_net_baryon_etas.txt', unpack=True)
         eta_proton, proton, error = np.loadtxt(
-            f'./{dataset_dir}/event_{event}_net_proton_eta.txt', unpack=True)
-
-        # Limit the energy level
-        # if proton.max() < 5.0:
-        #     continue
+            f'./{dataset}/event_{event}_net_proton_eta.txt', unpack=True)
 
         baryon = data_smoothing(baryon)
         proton = data_smoothing(proton)
@@ -112,10 +104,10 @@ def data_smoothing(data):
         data[i] = average
     return data
 
-class RealData(Dataset):
-    def __init__(self, size=1):
+class Data(Dataset):
+    def __init__(self, dataset, size=1):
         assert(size >= 1)
-        self.data, self.labels, self.data_axis = get_real_data(size)
+        self.data, self.labels, self.data_axis = get_real_data(dataset, size)
 
     def __len__(self):
         return len(self.data)
