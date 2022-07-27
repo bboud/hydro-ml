@@ -30,7 +30,7 @@ def plot_telemetry( loss_total, outputs, labels, etas=None):
     plt.show()
 
 def plot_output(outputs, labels):
-    fig = plt.figure(figsize=(20,10))
+    fig = plt.figure(figsize=(15,5))
 
     gs = gridspec.GridSpec(len(outputs), 1, hspace=len(outputs)*0.1)
 
@@ -46,28 +46,3 @@ def plot_output(outputs, labels):
         ax.legend()
 
     plt.show()
-
-# Legacy
-# def simple_layer_hook(layer_name, image_channel):
-#     def hook(module, input, output):
-#         if image_channel.get_mode() == Mode.NOISE:
-#             return
-#
-#         output_array = output.detach().numpy()
-#
-#         total = []
-#
-#         for i in range(output_array.shape[0]):
-#             total.append(output_array[i].flatten())
-#
-#         total = np.array(total)
-#
-#         assert(total.shape[1] % 3 == 0)
-#
-#         x_shape = total.shape[0]*3
-#         y_shape = total.shape[1]//3
-#
-#         image_channel.push( total.reshape(x_shape, y_shape), layer_name)
-#
-#         return output
-#     return hook

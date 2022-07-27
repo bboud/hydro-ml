@@ -1,3 +1,4 @@
+import numpy
 import numpy as np
 import os
 from numba import jit
@@ -89,8 +90,12 @@ def get_real_data(dataset, size):
         eta_proton, proton, error = np.loadtxt(
             f'./{dataset}/event_{event}_net_proton_eta.txt', unpack=True)
 
+        #Low energy filter
+        if proton.max() < 1.:
+            continue
+
         baryon = data_smoothing(baryon)
-        proton = data_smoothing(proton)
+        proton = data_smoothing(data_smoothing(proton))
 
         baryons.append(baryon.reshape(1, 141))
         protons.append(proton.reshape(1, 141))
@@ -115,22 +120,33 @@ class Data(Dataset):
     def __getitem__(self, item):
         return self.data[item], self.labels[item]
 
+    # Using multiple datasets, add them together
+    def __add__(self, other):
+        self.data = numpy.concatenate((self.data, other.data))
+        self.labels = numpy.concatenate((self.labels, other.labels))
+        return self
+
 ######################################## dE_detas DATA IMPORT ########################################
 
-def get_dE_detas_data():
-    dE_deta_initial = np.loadtxt('./dE_data/dE_detas_initial.txt')
-    dNch_deta_final = np.loadtxt('./dE_data/dNch_deta_final.txt')
+def get_dE_detas_data(data_folder):
+    dE_deta_initial = np.loadtxt(f'./{data_folder}/dE_detas_initial')
+    dNch_deta_final = np.loadtxt(f'./{data_folder}/dNch_deta_final')
 
     final_eta = dNch_deta_final[0:1].flatten()
 
-    return final_eta, dE_deta_initial[1:], dNch_deta_final[1:]
+    return final_eta, data_smoothing(dE_deta_initial), data_smoothing(dNch_deta_final)
 
 class DEData(Dataset):
-    def __init__(self):
-        self.data_axis, self.data, self.labels = get_dE_detas_data()
+    def __init__(self, data_folder):
+        self.data_axis, self.data, self.labels = get_dE_detas_data(data_folder)
 
     def __len__(self):
         return len(self.data)
 
     def __getitem__(self, item):
         return self.data[item], self.labels[item]
+
+    def __add__(self, other):
+        self.data = numpy.concatenate((self.data, other.data))
+        self.labels = numpy.concatenate((self.labels, other.labels))
+        return self
