@@ -1,6 +1,7 @@
 import numpy
 import numpy as np
 import os
+import sys
 from numba import jit
 from torch.utils.data import Dataset
 
@@ -110,7 +111,7 @@ def data_smoothing(data):
     return data
 
 class Data(Dataset):
-    def __init__(self, dataset, size=1):
+    def __init__(self, dataset, size=sys.maxsize):
         assert(size >= 1)
         self.data, self.labels, self.data_axis = get_real_data(dataset, size)
 
@@ -134,19 +135,8 @@ def get_dE_detas_data(data_folder):
 
     final_eta = dNch_deta_final[0:1].flatten()
 
-    return final_eta, data_smoothing(dE_deta_initial), data_smoothing(dNch_deta_final)
+    return final_eta, data_smoothing(dE_deta_initial[1:]), data_smoothing(dNch_deta_final[1:])
 
-class DEData(Dataset):
+class DEData(Data):
     def __init__(self, data_folder):
         self.data_axis, self.data, self.labels = get_dE_detas_data(data_folder)
-
-    def __len__(self):
-        return len(self.data)
-
-    def __getitem__(self, item):
-        return self.data[item], self.labels[item]
-
-    def __add__(self, other):
-        self.data = numpy.concatenate((self.data, other.data))
-        self.labels = numpy.concatenate((self.labels, other.labels))
-        return self
