@@ -78,8 +78,8 @@ needed.
 
 Second is the `plot_output` function which will show you the actual vs generated output of the model.
 
-![Baryon Model Image](images/baryon_model_image.png)
+![](./images/baryon_model_image.png)
 
 The third is the `plot_cc_graph` which will graph the correlation plot.
 
-![Energy Density Model](images/energy_density_image.png)
+![](./images/energy_density_image.png)
