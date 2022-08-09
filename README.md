@@ -78,8 +78,8 @@ needed.
 
 Second is the `plot_output` function which will show you the actual vs generated output of the model.
 
-![](./images/baryon_model_image.png)
+![](hydroml/images/baryon_model_image.png)
 
 The third is the `plot_cc_graph` which will graph the correlation plot.
 
-![](./images/energy_density_image.png)
+![](hydroml/images/energy_density_image.png)
