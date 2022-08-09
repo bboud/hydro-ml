@@ -4,8 +4,6 @@ import os
 import sys
 from torch.utils.data import Dataset
 
-######################################## REAL DATA IMPORT ########################################
-
 def get_real_data(dataset, size):
     events = []
     i = 0
