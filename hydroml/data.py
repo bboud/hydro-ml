@@ -63,6 +63,12 @@ class Data(Dataset):
         self.labels = numpy.concatenate((self.labels, other.labels))
         return self
 
+    def delete_elements(self, to_remove):
+        self.data = np.delete(self.data, to_remove, 0)
+        self.labels = np.delete(self.labels, to_remove, 0)
+
+        return self
+
     def trim(self, bound_1, bound_2):
         indices = []
         sum_x_axis = []
@@ -88,15 +94,22 @@ class Data(Dataset):
 
 ######################################## dE_detas DATA IMPORT ########################################
 
-def get_dE_detas_data(data_folder):
+def get_dE_detas_data(data_folder, standardize):
     dE_deta_initial = np.loadtxt(f'./{data_folder}/dE_detas_initial')
     dNch_deta_final = np.loadtxt(f'./{data_folder}/dNch_deta_final')
 
     start_eta = dE_deta_initial[0:1].flatten()
     final_eta = dNch_deta_final[0:1].flatten()
 
-    return start_eta, final_eta, data_smoothing(dE_deta_initial[1:]), data_smoothing(dNch_deta_final[1:])
+    dE_deta_initial = data_smoothing(dE_deta_initial[1:])
+    dNch_deta_final = data_smoothing(dNch_deta_final[1:])
+
+    if standardize:
+        dE_deta_initial = ( (dE_deta_initial - dE_deta_initial.mean()) / (dE_deta_initial.std()) )
+        dNch_deta_final = ( (dNch_deta_final - dNch_deta_final.mean()) / (dNch_deta_final.std()) )
+
+    return start_eta, final_eta, dE_deta_initial, dNch_deta_final
 
 class DEData(Data):
-    def __init__(self, data_folder):
-        self.start_eta, self.final_eta, self.data, self.labels = get_dE_detas_data(data_folder)
+    def __init__(self, data_folder, standardize=False):
+        self.start_eta, self.final_eta, self.data, self.labels = get_dE_detas_data(data_folder, standardize)
