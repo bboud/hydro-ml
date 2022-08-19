@@ -24,6 +24,18 @@ class Moments:
         self.kurt = np.mean(fourth_moment)/self.sigma**4
         self.kurt_error = np.std(fourth_moment)/np.sqrt(len(data) * self.sigma**4)
 
+    def __str__(self):
+        formatted_string = f'Mean: {self.mean}\n' \
+                           f'Standard Deviation: {self.sigma}\n' \
+                           f'Variance: {self.var} \n' \
+                           f'Variance Error: {self.var_error}\n' \
+                           f'Skew: {self.skew}\n' \
+                           f'Skew Error: {self.skew_error}\n' \
+                           f'Kurtosis: {self.kurt}\n' \
+                           f'Kurtosis Error: {self.kurt_error}'
+
+        return formatted_string
+
 def trim(eta, data, bound_1, bound_2):
     indices = []
     sum_x_axis = []
