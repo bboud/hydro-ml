@@ -2,7 +2,9 @@ import numpy
 import numpy as np
 import os
 import sys
+import utils
 from torch.utils.data import Dataset
+from scipy.interpolate import interp1d
 
 def get_real_data(dataset, size):
     events = []
@@ -92,24 +94,48 @@ class Data(Dataset):
         self.labels = np.array(new_labels)
         return self
 
-######################################## dE_detas DATA IMPORT ########################################
+    def interpolate(self):
+        new_data = []
+        new_labels = []
 
-def get_dE_detas_data(data_folder, standardize):
-    dE_deta_initial = np.loadtxt(f'./{data_folder}/dE_detas_initial')
-    dNch_deta_final = np.loadtxt(f'./{data_folder}/dNch_deta_final')
+        #x = np.linspace( self.final_eta[0], self.final_eta[-1], num=len() )
+        x_new_start = np.linspace(self.start_eta[0], self.start_eta[-1], num=500)
+        x_new_final = np.linspace(self.final_eta[0], self.final_eta[-1], num=500)
 
-    start_eta = dE_deta_initial[0:1].flatten()
-    final_eta = dNch_deta_final[0:1].flatten()
+        for i, data in enumerate(self.data):
+            d = interp1d( self.start_eta, data )
+            l = interp1d(self.final_eta, self.labels[i])
 
-    dE_deta_initial = data_smoothing(dE_deta_initial[1:])
-    dNch_deta_final = data_smoothing(dNch_deta_final[1:])
+            new_data.append(d( x_new_start ))
+            new_labels.append( l( x_new_final ) )
 
-    if standardize:
-        dE_deta_initial = ( (dE_deta_initial - dE_deta_initial.mean()) / (dE_deta_initial.std()) )
-        dNch_deta_final = ( (dNch_deta_final - dNch_deta_final.mean()) / (dNch_deta_final.std()) )
+            #print(self.final_eta[0], self.final_eta[-1])
+            #print(y(np.linspace(self.final_eta[0], self.final_eta[-1], num=141)))
 
-    return start_eta, final_eta, dE_deta_initial, dNch_deta_final
+        new_eta_start = np.linspace(self.start_eta[0], self.start_eta[-1], num=500)
+        new_eta_final = np.linspace(self.final_eta[0], self.final_eta[-1], num=500)
+
+        self.data = np.array(new_data)
+        self.labels = np.array(new_labels)
+        self.final_eta = np.array(new_eta_final)
+        self.start_eta = np.array(new_eta_start)
+        return self
+
+########
 
 class DEData(Data):
     def __init__(self, data_folder, standardize=False):
-        self.start_eta, self.final_eta, self.data, self.labels = get_dE_detas_data(data_folder, standardize)
+        dE_deta_initial = np.loadtxt(f'./{data_folder}/dE_detas_initial')
+        dNch_deta_final = np.loadtxt(f'./{data_folder}/dNch_deta_final')
+
+        self.start_eta = dE_deta_initial[0:1].flatten()
+        self.final_eta = dNch_deta_final[0:1].flatten()
+
+        self.data = data_smoothing(dE_deta_initial[1:])
+        self.labels = data_smoothing(dNch_deta_final[1:])
+
+        if standardize:
+            self.data = ((dE_deta_initial - np.mean(dE_deta_initial, axis=0)) / (
+                        np.std(dE_deta_initial, axis=0) + 1e-16))
+            self.labels = ((dNch_deta_final - np.mean(dNch_deta_final, axis=0)) / (
+                        np.std(dNch_deta_final, axis=0) + 1e-16))
