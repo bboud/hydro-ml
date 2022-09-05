@@ -17,30 +17,32 @@ This project contains a few Jupyter notebooks. The format adheres to the followi
 
 ### Use
 To get started, you need to place the data you would like to run in the same folder as the Jupyter notebooks. Then,
-depending on the format of your data, you may need to create your own import method. The `Data` class has you covered. 
-All you need to do is override the constructor to specify your own `get_data` method. 
+depending on the format of your data, you may need to create your own import method. The `Dataset` class has you covered. 
+All you need to do is override the constructor to specify your own data import  method. 
 ```python
 # Example of custom data class:
-def get_dE_detas_data(data_folder):
-    dE_deta_initial = np.loadtxt(f'./{data_folder}/dE_detas_initial')
-    dNch_deta_final = np.loadtxt(f'./{data_folder}/dNch_deta_final')
+class EnergyDensityDataset(Dataset):
+    def __init__(self, data_folder, standardize=False):
+        dE_deta_initial = np.loadtxt(f'./Datasets/{data_folder}/dE_detas_initial')
+        dNch_deta_final = np.loadtxt(f'./Datasets/{data_folder}/dET_deta_final')
 
-    start_eta = dE_deta_initial[0:1].flatten()
-    final_eta = dNch_deta_final[0:1].flatten()
+        self.start_eta = dE_deta_initial[0:1].flatten()
+        self.final_eta = dNch_deta_final[0:1].flatten()
 
-    return start_eta, final_eta, data_smoothing(dE_deta_initial[1:]), data_smoothing(dNch_deta_final[1:])
+        self.initial = np.array( dE_deta_initial[1:], dtype=np.float64 )
+        self.final = np.array( dNch_deta_final[1:], dtype=np.float64 )
 
-class DEData(Data):
-    def __init__(self, data_folder):
-        self.start_eta, self.final_eta, self.data, self.labels = get_dE_detas_data(data_folder)
+        if standardize:
+            self.initial = ((dE_deta_initial - np.mean(dE_deta_initial, axis=0)) / (
+                        np.std(dE_deta_initial, axis=0) + 1e-16))
+            self.final = ((dNch_deta_final - np.mean(dNch_deta_final, axis=0)) / (
+                        np.std(dNch_deta_final, axis=0) + 1e-16))
 ```
 
-For the rest of the code to work, it expects to have some initial eta, final eta, and of course the initial and final data. `self.labels` 
-is where the final data should go, as that is the "label" associated with each initial state data.
-
+For the rest of the code to work, it expects to have some initial eta, final eta, and of course the initial and final data.
 To combine multiple datasets, the addition operator has been implemented. It is as simple as the following:
 ```python
-dataset = DEData('dE_data') + DEData('dE_data_2')
+dataset = EnergyDensityDataset('dE_data') + EnergyDensityDataset('dE_data_2')
 ```
 **Please note that you must have data of the same type!**
 
@@ -61,7 +63,7 @@ You can now run the main loop by enumerating over the `data_loader` list.
 There are two different `trim` functions. The first `trim` function is a part of the Data class. Calling this function
 will trim down the dataset to the desired eta range.
 ```python
-dataset = DEData('dE_data').trim(-4.9, -4.) + DEData('dE_data_2').trim(-4.9, -4.)
+dataset = EnergyDensityDataset('dE_data').trim(-4.9, -4.) + EnergyDensityDataset('dE_data_2').trim(-4.9, -4.)
 ```
 This will give us a dataset where only values from eta -4.9 to -4.0 will be included. 
 
@@ -78,8 +80,8 @@ needed.
 
 Second is the `plot_output` function which will show you the actual vs generated output of the model.
 
-![](hydroml/images/baryon_model_image.png)
+![](images/baryon_model_image.png)
 
 The third is the `plot_cc_graph` which will graph the correlation plot.
 
-![](hydroml/images/energy_density_image.png)
+![](images/energy_density_image.png)
