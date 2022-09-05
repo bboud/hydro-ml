@@ -9,6 +9,15 @@ class BaryonModel(nn.Module):
         t = self.linear(t)
         return t
 
+class DELinearModel(nn.Module):
+    def __init__(self):
+        super(DELinearModel, self).__init__()
+        self.linear = nn.Linear(500, 141, bias=True)
+
+    def forward(self, t):
+        t = self.linear(t)
+        return t
+
 class DEModel(nn.Module):
     def __init__(self):
         super(DEModel, self).__init__()

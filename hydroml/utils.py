@@ -1,5 +1,4 @@
 import numpy as np
-import os
 
 class Moments:
     def __init__(self, data):
@@ -40,17 +39,11 @@ class Moments:
 #Trim batch or single data outside of the whole dataset
 def trim(eta, data, bound_1, bound_2):
     indices = []
-    x_axis = np.empty(dtype=np.float64)
+    x_axis = []
 
     for i, e in enumerate(eta):
         if bound_1 <= e <= bound_2:
             indices.append(i)
-            #Max size will only ever be 141, so clip the eta element to the end of the array.
-            np.put(x_axis, 141, e, mode='clip')
+            x_axis.append(e)
 
-    #Shape should be [batch size, 1, length of new eta]
-    batch = np.empty( shape=[data.size()[0], 1, len(x_axis)], dtype=np.float64)
-    for i, item in enumerate(data):
-        np.put(batch, 1024, item[0][ indices[0] : indices[-1] + 1 ])
-
-    return x_axis, batch
+    return np.array(x_axis, dtype=np.float64), np.array(data[ indices[0] : indices[-1] + 1 ], dtype=np.float64)

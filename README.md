@@ -20,29 +20,22 @@ To get started, you need to place the data you would like to run in the same fol
 depending on the format of your data, you may need to create your own import method. The `Dataset` class has you covered. 
 All you need to do is override the constructor to specify your own data import  method. 
 ```python
-# Example of custom data class:
 class EnergyDensityDataset(Dataset):
-    def __init__(self, data_folder, standardize=False):
-        dE_deta_initial = np.loadtxt(f'./Datasets/{data_folder}/dE_detas_initial')
-        dNch_deta_final = np.loadtxt(f'./Datasets/{data_folder}/dET_deta_final')
+    def __init__(self, initial_file, final_file):
+        dE_deta_initial = np.loadtxt(initial_file)
+        dNch_deta_final = np.loadtxt(final_file)
 
         self.start_eta = dE_deta_initial[0:1].flatten()
         self.final_eta = dNch_deta_final[0:1].flatten()
 
         self.initial = np.array( dE_deta_initial[1:], dtype=np.float64 )
         self.final = np.array( dNch_deta_final[1:], dtype=np.float64 )
-
-        if standardize:
-            self.initial = ((dE_deta_initial - np.mean(dE_deta_initial, axis=0)) / (
-                        np.std(dE_deta_initial, axis=0) + 1e-16))
-            self.final = ((dNch_deta_final - np.mean(dNch_deta_final, axis=0)) / (
-                        np.std(dNch_deta_final, axis=0) + 1e-16))
 ```
 
 For the rest of the code to work, it expects to have some initial eta, final eta, and of course the initial and final data.
 To combine multiple datasets, the addition operator has been implemented. It is as simple as the following:
 ```python
-dataset = EnergyDensityDataset('dE_data') + EnergyDensityDataset('dE_data_2')
+dataset = EnergyDensityDataset('../Datasets/dE_data-5.02tev/dE_detas_initial', '../Datasets/dE_data-5.02tev/dET_deta_final') + EnergyDensityDataset('../Datasets/dE_data-5.02tev/dE_detas_initial2', '../Datasets/dE_data-5.02tev/dET_deta_final2')
 ```
 **Please note that you must have data of the same type!**
 
@@ -63,7 +56,7 @@ You can now run the main loop by enumerating over the `data_loader` list.
 There are two different `trim` functions. The first `trim` function is a part of the Data class. Calling this function
 will trim down the dataset to the desired eta range.
 ```python
-dataset = EnergyDensityDataset('dE_data').trim(-4.9, -4.) + EnergyDensityDataset('dE_data_2').trim(-4.9, -4.)
+dataset = EnergyDensityDataset('../Datasets/dE_data-5.02tev/dE_detas_initial', '../Datasets/dE_data-5.02tev/dET_deta_final').trim(-4.9, -4.) + EnergyDensityDataset('../Datasets/dE_data-5.02tev/dE_detas_initial2', '../Datasets/dE_data-5.02tev/dET_deta_final2').trim(-4.9, -4.)
 ```
 This will give us a dataset where only values from eta -4.9 to -4.0 will be included. 
 

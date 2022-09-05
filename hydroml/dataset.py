@@ -3,24 +3,25 @@ import os
 import numpy as np
 from torch.utils.data import Dataset as DS
 from scipy.interpolate import interp1d
+from abc import ABC, abstractmethod
 
-class Dataset(DS):
-    def __init__(self, dataset, size=sys.maxsize):
-        self.initial = np.empty()
-        self.final = np.empty()
-        self.start_eta = np.empty()
-        self.final_eta = np.empty()
+class Dataset(DS, ABC):
+    @abstractmethod
+    def __init__(self):
+        pass
 
+    # Will return the length of all member elements of the dataset.
     def __len__(self):
         return len(self.initial)
 
     def __getitem__(self, item):
         return self.initial[item], self.final[item]
 
-    # Using multiple datasets, add them together
+    # Using multiple datasets, add them together. They must have the same eta ranges.
     def __add__(self, other):
-        self.initial = np.concatenate((self.initial, other.data))
-        self.final = np.concatenate((self.final, other.labels))
+        assert len(other.start_eta) == len(self.start_eta) and len(other.final_eta) == len(self.final_eta)
+        self.initial = np.concatenate((self.initial, other.initial))
+        self.final = np.concatenate((self.final, other.final))
         return self
 
     def delete_elements(self, to_remove):
@@ -29,6 +30,7 @@ class Dataset(DS):
 
         return self
 
+    #Trim the whole dataset down to a specific range.
     def trim(self, bound_1, bound_2):
         indices = []
         sum_x_axis = []
@@ -52,6 +54,7 @@ class Dataset(DS):
         self.final = np.array(new_labels, dtype=np.float64)
         return self
 
+    # Interpolate the whole dataset to a desired resolution.
     def interpolate(self, resolution=200):
         new_data = []
         new_labels = []
@@ -75,6 +78,7 @@ class Dataset(DS):
         self.start_eta = np.array(new_eta_start)
         return self
 
+    # Smooth the whole dataset.
     # Returning a null dataset. Needs to be fixed.
     def smooth(self):
         for i, data in enumerate(self.initial):
@@ -83,13 +87,19 @@ class Dataset(DS):
                 data[j] = average
             self.initial[i] = data
 
+    def standardize(self):
+        self.initial = ((self.initial - np.mean(self.initial, axis=0)) / (
+                np.std(self.initial, axis=0) + 1e-16))
+        self.final = ((self.final - np.mean(self.final, axis=0)) / (
+                np.std(self.final, axis=0) + 1e-16))
+
 class BaryonDataset(Dataset):
     def __init__(self, dataset, size=sys.maxsize):
         assert(size >= 1)
 
         events = []
         i = 0
-        for file in os.listdir(f'./{dataset}/'):
+        for file in os.listdir(dataset):
             if i >= size:
                 break
             # Only register events with baryon_etas
@@ -105,9 +115,9 @@ class BaryonDataset(Dataset):
         for event in events:
             # Eta is the same for the datasets
             eta_baryon, baryon = np.loadtxt(
-                f'./{dataset}/event_{event}_net_baryon_etas.txt', unpack=True)
+                f'{dataset}/event_{event}_net_baryon_etas.txt', unpack=True)
             eta_proton, proton, error = np.loadtxt(
-                f'./{dataset}/event_{event}_net_proton_eta.txt', unpack=True)
+                f'{dataset}/event_{event}_net_proton_eta.txt', unpack=True)
 
             # Low energy filter
             if proton.max() < 5.:
@@ -116,24 +126,18 @@ class BaryonDataset(Dataset):
             baryons.append( baryon.reshape(1, 141) )
             protons.append( proton.reshape(1, 141) )
 
-        self.data = np.array( baryons, dtype=np.float64 )
-        self.labels = np.array( protons, dtype=np.float64 )
+        self.initial = np.array( baryons, dtype=np.float64 )
+        self.final = np.array( protons, dtype=np.float64 )
         self.start_eta = np.array( eta_baryon, dtype=np.float64 )
         self.final_eta = np.array( eta_proton, dtype=np.float64 )
 
 class EnergyDensityDataset(Dataset):
-    def __init__(self, data_folder, standardize=False):
-        dE_deta_initial = np.loadtxt(f'./{data_folder}/dE_detas_initial')
-        dNch_deta_final = np.loadtxt(f'./{data_folder}/dET_deta_final')
+    def __init__(self, initial_file, final_file):
+        dE_deta_initial = np.loadtxt(initial_file)
+        dNch_deta_final = np.loadtxt(final_file)
 
         self.start_eta = dE_deta_initial[0:1].flatten()
         self.final_eta = dNch_deta_final[0:1].flatten()
 
-        self.data = np.array( dE_deta_initial[1:], dtype=np.float64 )
-        self.labels = np.array( dNch_deta_final[1:], dtype=np.float64 )
-
-        if standardize:
-            self.data = ((dE_deta_initial - np.mean(dE_deta_initial, axis=0)) / (
-                        np.std(dE_deta_initial, axis=0) + 1e-16))
-            self.labels = ((dNch_deta_final - np.mean(dNch_deta_final, axis=0)) / (
-                        np.std(dNch_deta_final, axis=0) + 1e-16))
+        self.initial = np.array( dE_deta_initial[1:], dtype=np.float64 )
+        self.final = np.array( dNch_deta_final[1:], dtype=np.float64 )
