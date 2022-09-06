@@ -86,6 +86,12 @@ class Dataset(DS, ABC):
                 average = np.float64((data[j - 2] + data[j - 1] + data[j] + data[j + 1] + data[j + 2]) / 5)
                 data[j] = average
             self.initial[i] = data
+        for i, data in enumerate(self.final):
+            for j in range(2, len(data) - 2):
+                average = np.float64((data[j - 2] + data[j - 1] + data[j] + data[j + 1] + data[j + 2]) / 5)
+                data[j] = average
+            self.final[i] = data
+        return self
 
     def standardize(self):
         self.initial = ((self.initial - np.mean(self.initial, axis=0)) / (
