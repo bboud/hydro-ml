@@ -1,5 +1,5 @@
 import numpy as np
-from torch import Tensor
+from torch import tensor
 
 class Moments:
     def __init__(self, data):
@@ -58,6 +58,7 @@ def batch_trim(eta, batch, bound_1, bound_2):
             output_eta = trim_eta
         output_data.append( trim_data )
 
-    output_data = Tensor( output_data ).reshape(batch.shape[0], 1, len(output_eta))
+    # Calling tensor directly is 'slow'
+    output_data = tensor(np.array(output_data)).reshape(batch.shape[0], 1, len(output_eta))
 
     return np.array( output_eta, dtype=np.float64 ), output_data

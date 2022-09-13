@@ -12,7 +12,7 @@ class BaryonModel(nn.Module):
 class DELinearModel(nn.Module):
     def __init__(self):
         super(DELinearModel, self).__init__()
-        self.linear = nn.Linear(500, 141, bias=True)
+        self.linear = nn.Linear(64, 141, bias=True)
 
     def forward(self, t):
         t = self.linear(t)
@@ -24,20 +24,31 @@ class DEConvolutionModel(nn.Module):
 
         ichannels = 1
 
-        self.conv1 = nn.Conv1d(in_channels= ichannels, out_channels= 1, kernel_size=16, stride=1, bias=True)
-        self.conv2 = nn.Conv1d(in_channels=1, out_channels= 1, kernel_size=8, stride=1, bias=True)
+        self.conv1 = nn.Conv1d(in_channels= ichannels, out_channels= 1, kernel_size=17, stride=1, padding='same', bias=False)
+        self.lin1 = nn.Linear(500, 400, bias=False)
+        self.lin2 = nn.Linear(400, 200, bias=False)
+        self.lin3 = nn.Linear(200, 141, bias=False)
+        self.lin4 = nn.Linear(141, 141, bias=False)
 
-        # self.lin1 = nn.Linear(376, 251)
-        # self.lin2 = nn.Linear(251, 126)
-        self.lin3 = nn.Linear(49, 9)
+        self.r = nn.ReLU()
 
     def forward(self, x):
-        r = nn.ReLU()
+        x = self.lin1(x)
+        x = self.r(self.conv1(x))
 
-        x = r(self.conv1(x))
-        x = r(self.conv2(x))
-        # x = self.lin1(x)
-        # x = self.lin2(x)
+        x = self.lin2(x)
         x = self.lin3(x)
+        x = self.lin4(x)
+
+        return x
+
+class DEIntegralModel(nn.Module):
+    def __init__(self):
+        super(DEIntegralModel, self).__init__()
+
+        self.lin1 = nn.Linear(141, 1, bias=False)
+
+    def forward(self, x):
+        x = self.lin1(x)
 
         return x

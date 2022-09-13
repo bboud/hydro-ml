@@ -79,7 +79,6 @@ class Dataset(DS, ABC):
         return self
 
     # Smooth the whole dataset.
-    # Returning a null dataset. Needs to be fixed.
     def smooth(self):
         for i, data in enumerate(self.initial):
             for j in range(2, len(data) - 2):
@@ -147,3 +146,7 @@ class EnergyDensityDataset(Dataset):
 
         self.initial = np.array( dE_deta_initial[1:], dtype=np.float64 )
         self.final = np.array( dNch_deta_final[1:], dtype=np.float64 )
+
+    def cosh(self):
+        self.initial = self.initial/np.cosh(self.start_eta)
+        return self
