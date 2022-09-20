@@ -32,24 +32,31 @@ class Dataset(DS, ABC):
 
     #Trim the whole dataset down to a specific range.
     def trim(self, bound_1, bound_2):
-        indices = []
-        sum_x_axis = []
+        indices_start = []
+        indices_final = []
+        sum_x_axis_start = []
+        sum_x_axis_final = []
         new_data = []
         new_labels = []
 
+        for i, eta in enumerate(self.start_eta):
+            if bound_1 <= eta <= bound_2:
+                indices_start.append(i)
+                sum_x_axis_start.append(eta)
+
         for i, eta in enumerate(self.final_eta):
             if bound_1 <= eta <= bound_2:
-                indices.append(i)
-                sum_x_axis.append(eta)
+                indices_final.append(i)
+                sum_x_axis_final.append(eta)
 
         for _, data in enumerate(self.initial):
-            new_data.append(data[indices[0] : indices[-1] + 1])
+            new_data.append(data[indices_start[0] : indices_start[-1] + 1])
 
         for _, label in enumerate(self.final):
-            new_labels.append(label[indices[0] : indices[-1] + 1])
+            new_labels.append(label[indices_final[0] : indices_final[-1] + 1])
 
-        self.start_eta = np.array(sum_x_axis)
-        self.final_eta = np.array(sum_x_axis)
+        self.start_eta = np.array(sum_x_axis_start)
+        self.final_eta = np.array(sum_x_axis_final)
         self.initial = np.array(new_data, dtype=np.float64)
         self.final = np.array(new_labels, dtype=np.float64)
         return self
