@@ -1,4 +1,7 @@
 import sys
+sys.path.append('../hydroml')
+from hydroml.utils import trim
+
 import os
 import numpy as np
 from torch.utils.data import Dataset as DS
@@ -157,3 +160,20 @@ class EnergyDensityDataset(Dataset):
     def cosh(self):
         self.initial = self.initial/np.cosh(self.start_eta)
         return self
+
+    def no_asymmetric(self):
+        to_remove = []
+        #Check all of the curves and remove any of them that seem too asymmetric
+        for i, curve in enumerate(self.final):
+            trim_axis_left, trim_curve_left = trim(self.final_eta, curve, self.final_eta[0], 0)
+            left_integral = np.trapz(trim_curve_left, trim_axis_left)
+
+            trim_axis_right, trim_curve_right = trim(self.final_eta, curve, 0, self.final_eta[-1])
+            right_integral = np.trapz(trim_curve_right, trim_axis_right)
+
+            difference = left_integral - right_integral
+            if difference > 200 or difference < -200:
+                to_remove.append(i)
+
+        print(to_remove)
+        return self.delete_elements(to_remove)
