@@ -52,6 +52,6 @@ def plot_cc_graph(actual, generated):
     ax0.text(0.05, 0.95, box_text, verticalalignment='top',
              bbox=props, transform=ax0.transAxes)
 
-    ax0.plot([0, 1000], [0, 1000], color='red')
+    ax0.plot([0, actual.max()], [0, generated.max()], color='red')
 
     plt.show()
