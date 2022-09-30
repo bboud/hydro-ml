@@ -25,10 +25,10 @@ class DEConvolutionModel(nn.Module):
         ichannels = 1
 
         self.conv1 = nn.Conv1d(in_channels= ichannels, out_channels= 1, kernel_size=17, stride=1, padding='same', bias=False)
-        self.lin1 = nn.Linear(500, 400, bias=False)
+        self.lin1 = nn.Linear(462, 400, bias=False)
         self.lin2 = nn.Linear(400, 200, bias=False)
-        self.lin3 = nn.Linear(200, 141, bias=False)
-        self.lin4 = nn.Linear(141, 141, bias=False)
+        self.lin3 = nn.Linear(200, 139, bias=False)
+        self.lin4 = nn.Linear(139, 139, bias=False)
 
         self.r = nn.ReLU()
 

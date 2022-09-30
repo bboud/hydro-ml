@@ -175,5 +175,19 @@ class EnergyDensityDataset(Dataset):
             if difference > 200 or difference < -200:
                 to_remove.append(i)
 
-        print(to_remove)
+        return self.delete_elements(to_remove)
+
+    def remove_anamalies(self, threshhold):
+        to_remove = []
+
+        for i, data in enumerate(self):
+            # Trim down the data to the section that we want.
+            trim_final_axis, trim_final = trim(self.final_eta, data[1], -4.9, -3.1)
+
+            integrated_final = np.trapz(trim_final, trim_final_axis)
+
+            if integrated_final > threshhold:
+                print(f'Removing events {i}')
+                to_remove.append(i)
+
         return self.delete_elements(to_remove)
