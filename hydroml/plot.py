@@ -28,7 +28,7 @@ def plot_output(eta, model_output, actual_output):
 
     plt.show()
 
-def plot_cc_graph(actual, generated):
+def plot_cc_graph(actual, generated, type):
     fig = plt.figure(figsize=(10, 10))
 
     ax0 = fig.add_subplot()
@@ -41,9 +41,9 @@ def plot_cc_graph(actual, generated):
 
     ax0.scatter(actual, generated, c=z1, cmap=color_map)
 
-    ax0.set_xlabel('$N^{ch}$(Actual)')
-    ax0.set_ylabel('$N^{ch}$(Generated)')
-    ax0.set_title('Actual vs Generated $N^{ch}$')
+    ax0.set_xlabel(f'${type}$(Actual)')
+    ax0.set_ylabel(f'${type}$(Generated)')
+    ax0.set_title(f'Actual vs Generated ${type}$')
 
     box_text = f'r = {stats.pearsonr(actual, generated)[0]:.4f}'
 
