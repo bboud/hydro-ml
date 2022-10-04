@@ -1,6 +1,4 @@
-import sys
-sys.path.append('../hydroml')
-from hydroml.utils import trim
+from utils import trim
 
 import os
 import numpy as np
