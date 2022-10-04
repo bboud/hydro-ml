@@ -3,6 +3,8 @@
 The goal of this project is to replace the need for classical hydrodynamic simulation of Quark-Gluon Plasma to infer certainly
 properties by converting initial state baryon distributions into final state net proton rapidity distributions using machine learning.
 
+You can find the full documentation [here](https://brandonb.info/hydroml-docs)!
+
 ### Modules
 This project contains a few Jupyter notebooks. The format adheres to the following naming scheme: 
 - `{model_name}_train.ipynb`: This will contain the code required to train the model relating to the specific model. The model weights will be saved to a file that corresponds to the model name. For example, the `baryons` model's weights will be named `baryons_model.pt`. 
