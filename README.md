@@ -37,7 +37,7 @@ class EnergyDensityDataset(Dataset):
 For the rest of the code to work, it expects to have some initial eta, final eta, and of course the initial and final data.
 To combine multiple datasets, the addition operator has been implemented. It is as simple as the following:
 ```python
-dataset = EnergyDensityDataset('../Datasets/dE_data-5.02tev/dE_detas_initial', '../Datasets/dE_data-5.02tev/dET_deta_final') + EnergyDensityDataset('../Datasets/dE_data-5.02tev/dE_detas_initial2', '../Datasets/dE_data-5.02tev/dET_deta_final2')
+dataset = EnergyDensityDataset('../data/dE_data-5.02tev/dE_detas_initial', '../data/dE_data-5.02tev/dET_deta_final') + EnergyDensityDataset('../data/dE_data-5.02tev/dE_detas_initial2', '../data/dE_data-5.02tev/dET_deta_final2')
 ```
 **Please note that you must have data of the same type!**
 
@@ -58,7 +58,7 @@ You can now run the main loop by enumerating over the `data_loader` list.
 There are two different `trim` functions. The first `trim` function is a part of the Data class. Calling this function
 will trim down the dataset to the desired eta range.
 ```python
-dataset = EnergyDensityDataset('../Datasets/dE_data-5.02tev/dE_detas_initial', '../Datasets/dE_data-5.02tev/dET_deta_final').trim(-4.9, -4.) + EnergyDensityDataset('../Datasets/dE_data-5.02tev/dE_detas_initial2', '../Datasets/dE_data-5.02tev/dET_deta_final2').trim(-4.9, -4.)
+dataset = EnergyDensityDataset('../data/dE_data-5.02tev/dE_detas_initial', '../data/dE_data-5.02tev/dET_deta_final').trim(-4.9, -4.) + EnergyDensityDataset('../data/dE_data-5.02tev/dE_detas_initial2', '../data/dE_data-5.02tev/dET_deta_final2').trim(-4.9, -4.)
 ```
 This will give us a dataset where only values from eta -4.9 to -4.0 will be included. 
 
