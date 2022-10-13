@@ -1,5 +1,5 @@
 import sys
-sys.path.append('.')
+sys.path.append('../hydroml')
 
 from utils import trim
 
@@ -36,7 +36,7 @@ class Dataset(DS, ABC):
         Removes data from both the initial and final state distributions using a single or array of indices.
 
         :param to_remove: The integer index or an array of indices that specify which elements to remove.
-        :type to_remove: int, numpy.array
+        :type to_remove: int, numpy.ndarray
 
         :return: Dataset object with removed members.
         :rtype: hydroml.dataset.Dataset

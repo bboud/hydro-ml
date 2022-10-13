@@ -20,13 +20,13 @@ def plot_output(eta, model_output, actual_output):
     Plots the output of the provided output/input pair.
 
     :param eta: The x-axis (eta)
-    :type eta: numpy.array
+    :type eta: numpy.ndarray
 
     :param model_output: The output of the model
-    :type model_output: numpy.array
+    :type model_output: numpy.ndarray
 
     :param actual_output: The final state distribution.
-    :type actual_output: numpy.array
+    :type actual_output: numpy.ndarray
     """
     fig = plt.figure(figsize=(15,5))
 
@@ -45,10 +45,10 @@ def plot_cc_graph(actual, generated, type):
     Plots the correlation graph of the integrated curves.
 
     :param actual: The final state distribution.
-    :type actual: numpy.array
+    :type actual: numpy.ndarray
 
     :param generated: The model output of the final state distribution.
-    :type generated: numpy.array
+    :type generated: numpy.ndarray
 
     :param type: The LaTeX string for the output of the integration.
     :type type: string

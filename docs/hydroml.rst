@@ -1,25 +1,32 @@
-hydroml
-=======
+hydroml package
+===============
 
-dataset
-----------------
+hydroml.dataset module
+----------------------
 
 .. automodule:: hydroml.dataset
    :members:
    :undoc-members:
    :show-inheritance:
 
+hydroml.inference module
+------------------------
 
-plot
--------------
+.. automodule:: hydroml.inference
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+hydroml.plot module
+-------------------
 
 .. automodule:: hydroml.plot
    :members:
    :undoc-members:
    :show-inheritance:
 
-utils
--------------
+hydroml.utils module
+--------------------
 
 .. automodule:: hydroml.utils
    :members:

@@ -13,13 +13,10 @@ def inference(model, data):
     You must load the model using pytorch! This function is basically a wrapper to verify the data before being passed to the model.
 
     :param model: The loaded DEConvolution Model
-    :ptype: model.DEConvolutionModel
-
-    :param eta: The x-axis (eta).
-    :ptype: numpy.ndarray
+    :type model: model.DEConvolutionModel
 
     :param data: The initial state distribution.
-    :ptype: numpy.ndarray
+    :type data: numpy.ndarray
 
     :return: The predicted final state psudorapidity distribution.
     :rtype: numpy.ndarray
@@ -40,7 +37,7 @@ def smooth(data):
     Smooths the data by taking the running average in order to remove noise.
 
     :param data: The data to be smoothed.
-    :ptype: numpy.ndarray
+    :type data: numpy.ndarray
 
     :return: Data that has been smoothed.
     :rtype: numpy.ndarray

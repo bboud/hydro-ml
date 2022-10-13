@@ -7,7 +7,7 @@ class Moments:
     Standard Deviation, Variance, Skew, Kurtosis.
 
     :param data: The data that the moment will be generated for.
-    :type data: numpy.array
+    :type data: numpy.ndarray
     """
     def __init__(self, data):
         self.data = np.array(data)
@@ -49,10 +49,10 @@ def trim(eta, data, bound_1, bound_2):
     """
     Trims a single data point into specific range. If you need to trim a batch, please see 'batch_trim'.
     :param eta: The x-axis (eta)
-    :type eta: numpy.array
+    :type eta: numpy.ndarray
 
     :param data: The data will be trimmed.
-    :type data: numpy.array
+    :type data: numpy.ndarray
 
     :param bound_1: The left most eta bound.
     :type bound_1: float
@@ -61,7 +61,7 @@ def trim(eta, data, bound_1, bound_2):
     :type bound_2: float
 
     :return: Returns the datapoint that has been trimmed.
-    :rtype: numpy.array
+    :rtype: numpy.ndarray
     """
     indices = []
     x_axis = []
@@ -77,10 +77,10 @@ def batch_trim(eta, batch, bound_1, bound_2):
     """
     Trims a batch of data points into specific range.
     :param eta: The x-axis (eta)
-    :type eta: numpy.array
+    :type eta: numpy.ndarray
 
     :param data: The batch of data that will be trimmed.
-    :type data: numpy.array
+    :type data: numpy.ndarray
 
     :param bound_1: The left most eta bound.
     :type bound_1: float
@@ -89,7 +89,7 @@ def batch_trim(eta, batch, bound_1, bound_2):
     :type bound_2: float
 
     :return: Returns the batch of datapoints that has been trimmed.
-    :rtype: numpy.array
+    :rtype: numpy.ndarray
     """
     output_eta = None
     output_data = []
