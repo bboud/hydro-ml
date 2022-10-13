@@ -1,5 +1,5 @@
 import sys
-sys.path.append('../hydroml/')
+sys.path.append('.')
 
 from utils import trim
 
