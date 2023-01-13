@@ -7,11 +7,12 @@ class BaryonModel(nn.Module):
         # Input Layer
         self.linear_in = nn.Linear(141, 141, bias=True)
 
-        self.linear_1 = nn.Linear(141, 32, bias=True)
+        self.linear_1 = nn.Linear(141, 4, bias=True)
 
-        self.linear_2 = nn.Linear(32, 141, bias=True)
+        self.linear_2 = nn.Linear(4, 141, bias=True)
 
         self.leaky = nn.LeakyReLU()
+        self.sigmoid = nn.Sigmoid()
 
     def forward(self, t):
         t = self.leaky(self.linear_in(t))
@@ -19,6 +20,18 @@ class BaryonModel(nn.Module):
         t = self.leaky(self.linear_1(t))
 
         t = self.leaky(self.linear_2(t))
+
+        return t
+
+class BaryonLModel(nn.Module):
+    def __init__(self):
+        super(BaryonLModel, self).__init__()
+
+        # Input Layer
+        self.linear_in = nn.Linear(141, 141, bias=True)
+
+    def forward(self, t):
+        t = self.linear_in(t)
 
         return t
 

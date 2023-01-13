@@ -7,7 +7,6 @@ class Dataset(Dataset):
 
         # Reshape the data to (Number of events, Number of Columns, Number of datapoints)
         data = data.reshape(data.size // gridNx, gridNx)
-
         self.eta = data[0]
         self.data = data[1:]
 

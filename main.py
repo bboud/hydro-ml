@@ -1,8 +1,5 @@
 import os
 import sys
-
-import numpy as np
-
 sys.path.insert(0, os.path.abspath(''))
 
 import argparse
@@ -13,7 +10,7 @@ from hydroml.inference import run
 def main():
 
     try:
-        f = open('../config.json', mode='r')
+        f = open('config.json', mode='r')
         config = json.load(f)
         f.close()
 
@@ -31,7 +28,7 @@ def main():
     args = parser.parse_args()
     try:
         # Abstraction to accommodate different data loading methods.
-        run( np.fromfile(args.dataset[0], np.float32), config['gridNx'] )
+        run( args.dataset[0], config['gridNx'] )
     except FileNotFoundError:
         print('The file could not be found.. \n')
         parser.print_help()
