@@ -2,19 +2,6 @@ import matplotlib.pyplot as plt
 import numpy as np
 from scipy import stats
 
-# def plot_telemetry(outputs, labels, etas):
-#     fig = plt.figure(figsize=(20,15))
-#
-#     ax1 = fig.add_subplot()
-#     ax1.plot(etas, outputs[0].flatten(), label="Generated Output", color='red')
-#     ax1.plot(etas, labels[0].flatten(), '-.', label="Actual Output", color='blue')
-#     ax1.set_title("Model Output")
-#     ax1.set_ylabel("$dN^{ch}/d\eta$")
-#     ax1.set_xlabel("$\eta$")
-#     ax1.legend()
-#
-#     plt.show()
-
 def plot_output(eta, model_output, actual_output):
     """
     Plots the output of the provided output/input pair.

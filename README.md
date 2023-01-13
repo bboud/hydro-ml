@@ -19,10 +19,10 @@ This project contains a few Jupyter notebooks. The format adheres to the followi
 
 ### Use
 To get started, you need to place the data you would like to run in the same folder as the Jupyter notebooks. Then,
-depending on the format of your data, you may need to create your own import method. The `Dataset` class has you covered. 
+depending on the format of your data, you may need to create your own import method. The `Data` class has you covered. 
 All you need to do is override the constructor to specify your own data import  method. 
 ```python
-class EnergyDensityDataset(Dataset):
+class EnergyDensityDataset(Data):
     def __init__(self, initial_file, final_file):
         dE_deta_initial = np.loadtxt(initial_file)
         dNch_deta_final = np.loadtxt(final_file)
