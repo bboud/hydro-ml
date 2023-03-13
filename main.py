@@ -26,9 +26,10 @@ def main():
 
     parser.add_argument('-d', '--dataset', nargs=1, required=True, help='loads the initial-state dataset')
     args = parser.parse_args()
+
     try:
         # Abstraction to accommodate different data loading methods.
-        run( args.dataset[0], config['gridNx'] )
+        run( args.dataset[0], config['gridNx'], config['model'] )
     except FileNotFoundError:
         print('The file could not be found.. \n')
         parser.print_help()

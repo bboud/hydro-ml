@@ -1,3 +1,4 @@
 {
-  "gridNx": 141
+  "gridNx": 141,
+  "model": "comb_conv_32.pt"
 }
