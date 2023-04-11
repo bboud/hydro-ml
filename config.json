@@ -1,4 +1,4 @@
 {
   "gridNx": 141,
-  "model": "comb_conv_32.pt"
+  "model": "baryon_model_19.6gev.pt"
 }
