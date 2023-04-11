@@ -4,6 +4,7 @@ sys.path.insert(0, os.path.abspath(''))
 
 import argparse
 import json
+import time
 
 from hydroml.inference import run
 
@@ -28,8 +29,13 @@ def main():
     args = parser.parse_args()
 
     try:
+        import time
+
+        start = time.time()
         # Abstraction to accommodate different data loading methods.
         run( args.dataset[0], config['gridNx'], config['model'] )
+        end = time.time()
+        print(f"Run time: {end - start} seconds")
     except FileNotFoundError:
         print('The file could not be found.. \n')
         parser.print_help()

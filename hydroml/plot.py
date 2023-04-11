@@ -27,6 +27,7 @@ def plot_output(eta, model_output, actual_output):
 
     plt.show()
 
+
 def plot_cc_graph(actual, generated, type):
     """
     Plots the correlation graph of the integrated curves.
@@ -52,9 +53,9 @@ def plot_cc_graph(actual, generated, type):
 
     ax0.scatter(actual, generated, c=z1, cmap=color_map)
 
-    ax0.set_xlabel(f'${type}$(Actual)')
-    ax0.set_ylabel(f'${type}$(Generated)')
-    ax0.set_title(f'Actual vs Generated ${type}$')
+    ax0.set_xlabel(f'{type}(Actual)')
+    ax0.set_ylabel(f'{type}(Generated)')
+    ax0.set_title(f'Actual vs Generated {type}')
 
     box_text = f'r = {stats.pearsonr(actual, generated)[0]:.4f}'
 
@@ -63,6 +64,6 @@ def plot_cc_graph(actual, generated, type):
     ax0.text(0.05, 0.95, box_text, verticalalignment='top',
              bbox=props, transform=ax0.transAxes)
 
-    ax0.plot([0, actual.max()], [0, generated.max()], color='red')
+    ax0.plot([0, actual.max()], [0, actual.max()], color='red')
 
     plt.show()
