@@ -1,25 +1,15 @@
 import os
 import sys
-sys.path.insert(0, os.path.abspath(''))
+sys.path.append('.')
+from hydroml import dataset as ds
 
 import argparse
 import json
-import time
+import numpy as np
 
-from hydroml.inference import run
+from inference import run
 
 def main():
-
-    try:
-        f = open('config.json', mode='r')
-        config = json.load(f)
-        f.close()
-
-        print(config)
-    except FileNotFoundError:
-        print('Cannot write default config file! You need to create a config.json!')
-        return
-
     parser = argparse.ArgumentParser(
         prog='hydroml',
         description='Run a machine learning model to generate the final-state net proton pseudorapidity distribution give a dataset of initial-state baryon density distribution.',
@@ -32,12 +22,18 @@ def main():
         import time
 
         start = time.time()
-        # Abstraction to accommodate different data loading methods.
-        run( args.dataset[0], config['gridNx'], config['model'] )
+
+        data = np.fromfile(f'{args.dataset[0]}', dtype=np.float32)
+        dataset = ds.InferenceDataset(data, None, 141)
+        print(dataset.eta)
+
+        run( dataset, "models/baryon_model_19.6gev.pt" )
+
         end = time.time()
         print(f"Run time: {end - start} seconds")
-    except FileNotFoundError:
+    except FileNotFoundError as e:
         print('The file could not be found.. \n')
+        print(e)
         parser.print_help()
 
 if __name__ == "__main__":

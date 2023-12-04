@@ -98,3 +98,7 @@ def plot_cc_graph(actual, generated, type):
     ax0.plot([0, actual.max()], [0, actual.max()], color='red')
 
     plt.show()
+
+def plot_error_of_time(error):
+    error = np.array(error).flatten()
+    plt.plot(error)
