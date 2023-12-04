@@ -3,7 +3,7 @@ import numpy as np
 from scipy import stats
 
 
-def plot_output_compare(eta, model_output, actual_output, index):
+def plot_output_compare(eta, model_output, actual_output):
     """
     Plots the output of the provided output/input pair.
 
@@ -30,7 +30,7 @@ def plot_output_compare(eta, model_output, actual_output, index):
     #plt.savefig(f"./plots/{index}.png")
 
 
-def plot_output(eta, protons, baryons):
+def plot_output(eta, baryons, protons):
     """
     Plots the output of the provided output/input pair.
 
