@@ -33,7 +33,7 @@ model = BaryonModel()
 
 optimizer = torch.optim.SGD(model.parameters(), lr=learning_rate)
 
-loss_func = torch.nn.MSELoss()
+loss_func = torch.nn.MSELoss(reduction='sum')
 
 for epoch in range(epochs):
     for i, data in enumerate(data_loader):
