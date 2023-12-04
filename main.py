@@ -4,7 +4,6 @@ sys.path.append('.')
 from hydroml import dataset as ds
 
 import argparse
-import json
 import numpy as np
 
 from inference import run

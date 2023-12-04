@@ -5,11 +5,11 @@ class BaryonModel(nn.Module):
         super(BaryonModel, self).__init__()
 
         # Input Layer
-        self.linear_in = nn.Linear(141, 256, bias=False)
+        self.linear_in = nn.Linear(141, 256)
 
-        self.linear_1 = nn.Linear(256, 256, bias=False)
+        self.linear_1 = nn.Linear(256, 256)
 
-        self.linear_2 = nn.Linear(256, 141, bias=False)
+        self.linear_2 = nn.Linear(256, 141)
 
         self.leaky = nn.LeakyReLU()
 

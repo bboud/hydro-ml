@@ -102,3 +102,4 @@ def plot_cc_graph(actual, generated, type):
 def plot_error_of_time(error):
     error = np.array(error).flatten()
     plt.plot(error)
+    plt.show()
