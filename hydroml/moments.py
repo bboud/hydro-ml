@@ -1,4 +1,6 @@
+import numpy
 import numpy as np
+from scipy import stats
 
 class Moments:
     """
@@ -12,6 +14,8 @@ class Moments:
         self.data = np.array(data)
         self.mean = self.data.mean()
         self.sigma = self.data.std()
+
+        self.mean_error = stats.sem(data)
 
         self.second_moment = []
         self.third_moment = []
@@ -33,7 +37,10 @@ class Moments:
 
     def __str__(self):
         formatted_string = f'Mean: {self.mean}\n' \
+                           f'Mean (scipy): {stats.hmean(self.data)}\n' \
+                           f'Mean Error: {self.mean_error}\n' \
                            f'Standard Diviation: {self.sigma}\n' \
+                           f'Standard Error: {self.sigma/numpy.sqrt(len(self.data))}\n' \
                            f'Variance: {self.var} \n' \
                            f'Variance Error: {self.var_error}\n' \
                            f'Skew: {self.skew}\n' \

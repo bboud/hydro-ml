@@ -2,7 +2,8 @@ import matplotlib.pyplot as plt
 import numpy as np
 from scipy import stats
 
-def plot_output(eta, model_output, actual_output):
+
+def plot_output_compare(eta, model_output, actual_output, index):
     """
     Plots the output of the provided output/input pair.
 
@@ -15,18 +16,48 @@ def plot_output(eta, model_output, actual_output):
     :param actual_output: The final state distribution.
     :type actual_output: numpy.ndarray
     """
-    fig = plt.figure(figsize=(15,5))
+    fig = plt.figure(figsize=(12, 5))
 
     ax = fig.add_subplot()
-    ax.plot(eta, model_output.flatten(), label="Generated Pseudorapidity Distribution", color='red')
-    ax.plot(eta, actual_output.flatten(), '-.', label="Real Pseudorapidity Distribution", color='blue')
-    ax.set_title("Model Output")
-    ax.set_ylabel("$dN^{ch}/d\eta$")
-    ax.set_xlabel("$\eta$")
+    ax.plot(eta, model_output.flatten(), label="Model Generated", color='blue')
+    ax.plot(eta, actual_output.flatten(), label="Real Simulation", color='green')
+    ax.set_title("Model vs Real Simulated")
+    ax.set_ylabel("$dN^{p-\\bar{p}}/dy$")
+    ax.set_xlabel("$y$")
     ax.legend()
 
     plt.show()
+    #plt.savefig(f"./plots/{index}.png")
 
+
+def plot_output(eta, protons, baryons):
+    """
+    Plots the output of the provided output/input pair.
+
+    :param eta: The x-axis (eta)
+    :type eta: numpy.ndarray
+
+    :param model_output: The output of the model
+    :type model_output: numpy.ndarray
+
+    :param actual_output: The final state distribution.
+    :type actual_output: numpy.ndarray
+    """
+    fig = plt.figure(figsize=(12, 5))
+    ax = fig.add_subplot()
+    ax.plot(eta, baryons.flatten(), color="blue")
+    ax.set_title("Net Baryon Charge Rapidity Distribution")
+    ax.set_ylabel("$dN/d\eta_s$")
+    ax.set_xlabel("$\eta_s$")
+    plt.show()
+
+    fig = plt.figure(figsize=(12, 5))
+    ax = fig.add_subplot()
+    ax.plot(eta, protons.flatten(), color="green")
+    ax.set_title("Net Proton Rapidity Distribution")
+    ax.set_ylabel("$dN^{p-\\bar{p}}/dy$")
+    ax.set_xlabel("$y$")
+    plt.show()
 
 def plot_cc_graph(actual, generated, type):
     """

@@ -2,3 +2,5 @@
 /docs/_templates
 /docs/_static
 /datasets/
+__pycache__/
+.DS_Store
