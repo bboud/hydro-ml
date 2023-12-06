@@ -54,3 +54,26 @@ def batch_trim(eta, batch, bound_1, bound_2):
     output_data = np.array(output_data, dtype=np.float32)
 
     return np.array( output_eta, dtype=np.float32 ), np.array(output_data, dtype=np.float32)
+
+def poly_regression(x, y):
+    # Regression to x^5
+    # Wrong shape, easy to load columns
+    A = np.ndarray(shape=(6, len(x)))
+    A[0] = np.ones_like(x)
+    A[1] = x
+    A[2] = x**2
+    A[3] = x**3
+    A[4] = x**4
+    A[5] = x**5
+
+    # Transpose to right shape
+    B = np.transpose(A)
+
+    # Calculate projection matrix 
+    B_ti = np.linalg.inv( np.matmul( np.transpose(B), B ) )
+    proj_mat = np.matmul( B_ti, np.transpose(B) )
+
+    # Project vector onto projection matrix to get polynomial coefficients
+    coeffs = np.matmul(proj_mat, y)
+
+    return np.matmul(B, coeffs)

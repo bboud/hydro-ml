@@ -21,3 +21,24 @@ class BaryonModel(nn.Module):
         t = self.leaky(self.linear_2(t))
 
         return t
+    
+class EccentricitiesModel(nn.Module):
+    def __init__(self):
+        super(EccentricitiesModel, self).__init__()
+
+        self.layer_in = nn.Linear(64, 64)
+
+        self.layer_1 = nn.Linear(64, 141)
+
+        self.layer_out = nn.Linear(141, 141)
+
+        self.leaky = nn.LeakyReLU()
+        self.tanh = nn.Tanh()
+
+    def forward(self, t):
+
+        t = self.leaky(self.layer_in(t))
+        t = self.leaky(self.layer_1(t))
+        t = self.tanh(self.layer_out(t))
+
+        return t
