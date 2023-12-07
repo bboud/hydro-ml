@@ -37,7 +37,6 @@ class Moments:
 
     def __str__(self):
         formatted_string = f'Mean: {self.mean}\n' \
-                           f'Mean (scipy): {stats.hmean(self.data)}\n' \
                            f'Mean Error: {self.mean_error}\n' \
                            f'Standard Diviation: {self.sigma}\n' \
                            f'Standard Error: {self.sigma/numpy.sqrt(len(self.data))}\n' \

@@ -55,16 +55,14 @@ def batch_trim(eta, batch, bound_1, bound_2):
 
     return np.array( output_eta, dtype=np.float32 ), np.array(output_data, dtype=np.float32)
 
-def poly_regression(x, y):
+def poly_regression(x, y, order):
     # Regression to x^5
     # Wrong shape, easy to load columns
-    A = np.ndarray(shape=(6, len(x)))
+    A = np.ndarray(shape=(order+1, len(x)))
     A[0] = np.ones_like(x)
-    A[1] = x
-    A[2] = x**2
-    A[3] = x**3
-    A[4] = x**4
-    A[5] = x**5
+
+    for i in range(1, order+1):
+        A[i] = x**i
 
     # Transpose to right shape
     B = np.transpose(A)
@@ -77,3 +75,11 @@ def poly_regression(x, y):
     coeffs = np.matmul(proj_mat, y)
 
     return np.matmul(B, coeffs)
+
+def batch_poly_regression(x, y, order):
+    output_y = []
+
+    for i in y:
+        output_y.append(poly_regression(x, i, order))
+
+    return np.array(output_y, dtype=np.float32)

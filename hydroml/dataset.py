@@ -1,31 +1,26 @@
 import numpy as np
 from torch.utils.data import Dataset
 import torch
+from hydroml.utils import batch_poly_regression, batch_trim
 
 import h5py
 
-# Warning!
-# This dataset class is designed for the .dat files.
-# This includes the first 141 elements being eta
-# and all the rest being the data..
-
-# Different import methods will require a different Dataset class
-
 class TrainDataset(Dataset):
-    def __init__(self, keys: np.ndarray, values: np.ndarray, gridNx):
-        self.gridNx = gridNx
+    def __init__(self, keys: np.ndarray, values: np.ndarray, eta, resolution=None):
 
-        # Reshape the data to (Number of events, Number of datapoints)
-        keys = keys.reshape(keys.size // gridNx, gridNx)
-        self.eta = keys[0]
-        self.keys = keys[1:]
+        if resolution is None:
+            self.eta = eta
+            self.keys = keys
+            self.values = batch_poly_regression(self.eta, values, 15 ) or np.ones_like(self.eta)
+            
+            super(Dataset, self).__init__()
+            return
 
-        self.kshape = self.keys.shape
+        self.eta, self.keys = batch_trim(eta, keys, -resolution, resolution)
 
         if values is not None:
-            values = values.reshape(values.size // gridNx, gridNx)
-            self.values = values[1:]
-            self.vshape = self.keys.shape
+            _, self.values = batch_trim(eta, values, -resolution, resolution)
+            self.values = batch_poly_regression(self.eta, self.values, 15 )
 
         super(Dataset, self).__init__()
 
@@ -40,23 +35,30 @@ class TrainDataset(Dataset):
 
     def __add__(self, other):
         self.keys = np.append(self.keys, other.keys)
-        self.keys = self.keys.reshape(self.keys.size // self.gridNx, self.gridNx)
+        self.keys = self.keys.reshape(self.keys.size // len(self.eta), len(self.eta))
         if self.values is not None:
             self.values = np.append(self.values, other.values)
-            self.values = self.values.reshape(self.values.size // self.gridNx, self.gridNx)
+            self.values = self.keys.reshape(self.keys.size // len(self.eta), len(self.eta))
 
         return self
     
-class InferenceDataset(Dataset):
-    def __init__(self, keys: np.ndarray, gridNx):
-        self.gridNx = gridNx
+class TrainDatasetRu(Dataset):
+    def __init__(self, keys: np.ndarray, values: np.ndarray, etaInit, etaFinal, sizeInit, sizeFinal, resolution=None):
 
-        # Reshape the data to (Number of events, Number of datapoints)
-        keys = keys.reshape(keys.size // gridNx, gridNx)
-        self.eta = keys[0]
-        self.keys = keys[1:]
+        if resolution is None:
+            self.etaInit = etaInit
+            self.etaFinal = etaFinal
+            self.keys = keys
+            self.values = batch_poly_regression(self.etaFinal, values, 15 ) or np.ones_like(self.eta)
+            
+            super(Dataset, self).__init__()
+            return
 
-        self.kshape = self.keys.shape
+        self.etaInit, self.keys = batch_trim(etaInit, keys, -resolution, resolution)
+
+        if values is not None:
+            self.etaFinal, self.values = batch_trim(etaFinal, values, -resolution, resolution)
+            self.values = batch_poly_regression(self.etaFinal, self.values, 15 )
 
         super(Dataset, self).__init__()
 
@@ -64,11 +66,17 @@ class InferenceDataset(Dataset):
         return len(self.keys)
 
     def __getitem__(self, item):
-        return self.keys[item]
+        if self.values is None:
+            return self.keys[item], np.zeros_like(self.eta)
+        else:
+            return self.keys[item], self.values[item]
 
     def __add__(self, other):
         self.keys = np.append(self.keys, other.keys)
-        self.keys = self.keys.reshape(self.keys.size // self.gridNx, self.gridNx)
+        self.keys = self.keys.reshape(self.keys.size // len(self.etaInit), len(self.etaInit))
+        if self.values is not None:
+            self.values = np.append(self.values, other.values)
+            self.values = self.keys.reshape(self.keys.size // len(self.etaFinal), len(self.etaFinal))
 
         return self
     

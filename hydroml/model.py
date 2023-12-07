@@ -1,15 +1,15 @@
 from torch import nn
 
 class BaryonModel(nn.Module):
-    def __init__(self):
+    def __init__(self, sizeInit, sizeFinal):
         super(BaryonModel, self).__init__()
 
         # Input Layer
-        self.linear_in = nn.Linear(141, 256)
+        self.linear_in = nn.Linear(sizeInit, 256)
 
         self.linear_1 = nn.Linear(256, 256)
 
-        self.linear_2 = nn.Linear(256, 141)
+        self.linear_2 = nn.Linear(256, sizeFinal)
 
         self.leaky = nn.LeakyReLU()
 
