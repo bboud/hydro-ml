@@ -5,11 +5,11 @@ class BaryonModel(nn.Module):
         super(BaryonModel, self).__init__()
 
         # Input Layer
-        self.linear_in = nn.Linear(sizeInit, 256)
+        self.linear_in = nn.Linear(sizeInit, sizeInit)
 
-        self.linear_1 = nn.Linear(256, 256)
+        self.linear_1 = nn.Linear(sizeInit, sizeFinal)
 
-        self.linear_2 = nn.Linear(256, sizeFinal)
+        self.linear_2 = nn.Linear(sizeFinal, sizeFinal)
 
         self.leaky = nn.LeakyReLU()
 
@@ -23,14 +23,14 @@ class BaryonModel(nn.Module):
         return t
     
 class EccentricitiesModel(nn.Module):
-    def __init__(self):
+    def __init__(self, sizeInit, sizeFinal):
         super(EccentricitiesModel, self).__init__()
 
-        self.layer_in = nn.Linear(64, 64)
+        self.layer_in = nn.Linear(sizeInit, 64)
 
-        self.layer_1 = nn.Linear(64, 141)
+        self.layer_1 = nn.Linear(64, 256)
 
-        self.layer_out = nn.Linear(141, 141)
+        self.layer_out = nn.Linear(256, sizeFinal)
 
         self.leaky = nn.LeakyReLU()
         self.tanh = nn.Tanh()

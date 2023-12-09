@@ -3,7 +3,7 @@ import numpy as np
 from scipy import stats
 
 
-def plot_output_compare(eta, model_output, actual_output):
+def plot_output_compare(etaFinal, model_output, actual_output, index=None, epoch=None):
     """
     Plots the output of the provided output/input pair.
 
@@ -16,21 +16,22 @@ def plot_output_compare(eta, model_output, actual_output):
     :param actual_output: The final state distribution.
     :type actual_output: numpy.ndarray
     """
-    fig = plt.figure(figsize=(12, 5))
+    fig = plt.figure(figsize=(5, 2))
 
     ax = fig.add_subplot()
-    ax.plot(eta, model_output.flatten(), label="Model Generated", color='blue')
-    ax.plot(eta, actual_output.flatten(), label="Real Simulation", color='green')
-    ax.set_title("Model vs Real Simulated")
+    ax.plot(etaFinal, model_output.flatten(), label="Model Generated", color='blue')
+    ax.plot(etaFinal, actual_output.flatten(), label="Real Simulation", color='green')
+    ax.set_title(f"Model Output vs Simulation Data")
     ax.set_ylabel("$dN^{p-\\bar{p}}/dy$")
     ax.set_xlabel("$y$")
     ax.legend()
 
     plt.show()
-    #plt.savefig(f"./plots/{index}.png")
+    #plt.savefig(f"./plots/{epoch}_{index}.png")
+    plt.close()
 
 
-def plot_output(eta, baryons, protons):
+def plot_output(etaInit, etaFinal, baryons, protons):
     """
     Plots the output of the provided output/input pair.
 
@@ -43,17 +44,17 @@ def plot_output(eta, baryons, protons):
     :param actual_output: The final state distribution.
     :type actual_output: numpy.ndarray
     """
-    fig = plt.figure(figsize=(12, 5))
+    fig = plt.figure(figsize=(5, 2))
     ax = fig.add_subplot()
-    ax.plot(eta, baryons.flatten(), color="blue")
+    ax.plot(etaInit, baryons.flatten(), color="blue")
     ax.set_title("Net Baryon Charge Rapidity Distribution")
     ax.set_ylabel("$dN/d\eta_s$")
     ax.set_xlabel("$\eta_s$")
     plt.show()
 
-    fig = plt.figure(figsize=(12, 5))
+    fig = plt.figure(figsize=(5, 2))
     ax = fig.add_subplot()
-    ax.plot(eta, protons.flatten(), color="green")
+    ax.plot(etaFinal, protons.flatten(), color="green")
     ax.set_title("Net Proton Rapidity Distribution")
     ax.set_ylabel("$dN^{p-\\bar{p}}/dy$")
     ax.set_xlabel("$y$")
@@ -72,7 +73,7 @@ def plot_cc_graph(actual, generated, type):
     :param type: The LaTeX string for the output of the integration.
     :type type: string
     """
-    fig = plt.figure(figsize=(10, 10))
+    fig = plt.figure(figsize=(5, 5))
 
     ax0 = fig.add_subplot()
 
@@ -86,7 +87,7 @@ def plot_cc_graph(actual, generated, type):
 
     ax0.set_xlabel(f'{type}(Actual)')
     ax0.set_ylabel(f'{type}(Generated)')
-    ax0.set_title(f'Actual vs Generated {type}')
+    ax0.set_title(f'Integral of {type}')
 
     box_text = f'r = {stats.pearsonr(actual, generated)[0]:.4f}'
 

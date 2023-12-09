@@ -8,10 +8,12 @@ from hydroml.dataset import TrainDataset
 
 from torch.utils.data import DataLoader
 
+from hydroml.plot import plot_output_compare
+
 import torch
 
 batch_size = 1
-epochs = 20
+epochs = 40
 learning_rate = 1e-5
 
 net_Baryons_19_1 = np.fromfile('datasets/training/NetbaryonDis_OSG3DAuAu19.6_tune18.3_wBulk_22momdeltaf_netBaryon.dat', dtype=np.float32)
@@ -38,7 +40,7 @@ model = BaryonModel(len(dataset_1.eta), len(dataset_1.eta))
 
 optimizer = torch.optim.SGD(model.parameters(), lr=learning_rate)
 
-loss_func = torch.nn.MSELoss()
+loss_func = torch.nn.MSELoss(reduction='sum')
 
 for epoch in range(epochs):
     print(f'Epoch: {epoch}')
@@ -52,7 +54,10 @@ for epoch in range(epochs):
 
         loss = loss_func(output, values)
 
+        if i % 100 == 0:
+            plot_output_compare(dataset_1.eta, output.detach().numpy(), values, i, epoch)
+
         loss.backward()
         optimizer.step()
 
-torch.save(model, "models/baryon_model_19.6gev.pt")
+#torch.save(model, "models/baryon_model_19.6gev.pt")

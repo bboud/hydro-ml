@@ -1,7 +1,7 @@
 import numpy as np
 from torch.utils.data import Dataset
 import torch
-from hydroml.utils import batch_poly_regression, batch_trim
+from hydroml.utils import batch_poly_regression, batch_trim, poly_regression, trim
 
 import h5py
 
@@ -85,6 +85,11 @@ class VectorsDataset(Dataset):
         super(Dataset, self).__init__()
 
         self.results = []
+        self.initEta = None
+        self.finalEta = None
+
+        bounds = 3.4
+        smoothing_order = 10
 
         data = h5py.File(file)
 
@@ -97,13 +102,29 @@ class VectorsDataset(Dataset):
             # Get the last ed_tau
             initial = result[eccent_list[-1]]
             comp_tens = torch.transpose(torch.tensor(initial[:], dtype=torch.float32), 0, 1)
-            initial_tensor = [comp_tens[0], comp_tens[4], comp_tens[5]]
+
+            initEta, initReal = trim(comp_tens[0], comp_tens[4], -bounds, bounds)
+
+            if self.initEta is None:
+                self.initEta = initEta
+
+            _, initImg = trim(comp_tens[0], comp_tens[5], -bounds, bounds)
+
+            initial_tensor = [initEta, initReal, initImg]
             return initial_tensor
                 
         def _getFinalCompTensor(result):
             final = result['particle_9999_dNdeta_pT_0.2_3.dat']
             comp_tens = torch.transpose(torch.tensor(final[:], dtype=torch.float32), 0, 1)
-            final_tensor = [comp_tens[0], comp_tens[5], comp_tens[6]]
+
+            finalEta, finalReal = trim(comp_tens[0], comp_tens[5], -bounds, bounds)
+
+            if self.finalEta is None:
+                self.finalEta = finalEta
+
+            _, finalImg = trim(comp_tens[0], comp_tens[6], -bounds, bounds)
+
+            final_tensor = [finalEta, poly_regression(finalEta, finalReal, smoothing_order), poly_regression(finalEta, finalImg, smoothing_order)]
             return final_tensor
 
         for v in data.keys():

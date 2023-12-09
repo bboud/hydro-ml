@@ -74,7 +74,7 @@ def poly_regression(x, y, order):
     # Project vector onto projection matrix to get polynomial coefficients
     coeffs = np.matmul(proj_mat, y)
 
-    return np.matmul(B, coeffs)
+    return np.matmul(B, coeffs, dtype=np.float32)
 
 def batch_poly_regression(x, y, order):
     output_y = []
